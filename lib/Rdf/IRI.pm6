@@ -39,7 +39,7 @@ package Rdf {
     # Returns an undefined object if iri representation is not known. An IRI
     # object is returned if a representation is found.
     #
-    method check-iri ( Str $short-iri --> Rdf::IRI ) {
+    method check-iri ( Str $short-iri where ?$short-iri --> Rdf::IRI ) {
 
       my Rdf::IRI $iri;
 
