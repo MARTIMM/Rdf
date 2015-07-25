@@ -1,0 +1,15 @@
+{
+  "author": "Marcel Timmerman",
+  "depends": [
+#    "Semi-xml",
+    "XML"
+  ],
+  "description": "Rdf",
+  "name": "Rdf",
+  "provides": {
+    "Rdf": "lib/Rdf.pm6"
+    "Rdf": "lib/Rdf/IRI.pm6"
+  },
+  "source-url": "git://github.com/MARTIMM/Rdf.git",
+  "version": "0.1.0"
+}
