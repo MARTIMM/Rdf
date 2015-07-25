@@ -1,6 +1,7 @@
 use v6;
 use Test;
 
+use Rdf;
 use Rdf::IRI;
 
 
@@ -17,6 +18,7 @@ subtest {
   my Rdf::IRI $i1 .= check-iri('abc');
   isa-ok $i1, 'IRI', 'i1 is IRI';
   is "$i1", 'file://Perl6/Projects/Rdf#abc', "IRI i1 = $i1";
+  is $i1.get-type, $Rdf::NODE-IRI, "Iri type code is $Rdf::NODE-IRI";
 
   my Rdf::IRI $i2 .= new(:iri('abc'));
   isa-ok $i2, 'IRI', 'i2 is IRI';
