@@ -15,7 +15,7 @@ package Rdf {
 
     #---------------------------------------------------------------------------
     #
-    submethod BUILD ( Str :$form, Str :$datatype, Str :$lang-tag is copy ) {
+    multi submethod BUILD ( Str :$form, Str :$datatype, Str :$lang-tag is copy ) {
 
       # Normalize to lowercase
       #
@@ -26,7 +26,7 @@ package Rdf {
       $dt .= check-iri('xs:string') unless $dt.defined;
 
       # Check data type
-      
+
       # Check language tag
 
       $!form = $form;
@@ -34,6 +34,14 @@ package Rdf {
       $!lang-tag = $lang-tag if $lang-tag.defined;
 
       self.set-type($Rdf::NODE-LITERAL);
+    }
+
+    #---------------------------------------------------------------------------
+    # Shortcuts
+    #
+    multi submethod BUILD ( Int :$form ) {
+      $!form = $form.fmt('%s');
+      $!datatype .= check-iri('xs:integer');
     }
 
     #---------------------------------------------------------------------------
@@ -62,7 +70,7 @@ package Rdf {
       if $!lang-tag.defined {
         $value ~= "\@$!lang-tag";
       }
-      
+
       elsif $!datatype !~~ Rdf::IRI.check-iri('xs:string') {
         $value ~= "^^$!datatype";
       }

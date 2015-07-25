@@ -7,10 +7,13 @@ use Rdf::Literal;
 #-------------------------------------------------------------------------------
 subtest {
   my Rdf::Literal $lit;
-  
+
   $lit .= new( :form('10'), :datatype('xs:integer'));
   is $lit.get-value, '10^^http://www.w3.org/2001/XMLSchema#integer', "Value is '{$lit.get-value}'";
-  
+
+  $lit .= new( :form(11));
+  is $lit.get-value, '11^^http://www.w3.org/2001/XMLSchema#integer', "Value is '{$lit.get-value}'";
+
   $lit .= new( :form('hooperde poop'));
   is $lit.get-value, 'hooperde poop^^http://www.w3.org/2001/XMLSchema#string', "Value is '{$lit.get-value}'";
 
