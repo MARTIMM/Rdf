@@ -1,5 +1,12 @@
 package Rdf:ver<0.1.0> {
 
+  # Definition of used constants
+  #
+  constant $NODE-IRI            = 0x0001;
+  constant $NODE-BLANK          = 0x0002;
+  constant $NODE-LITERAL        = 0x0003;
+  constant $NODE-GRAPH          = 0x0004;
+
   # Prefixes are visible in every OWL object;
   #
   our $prefixes = Hash.new;
