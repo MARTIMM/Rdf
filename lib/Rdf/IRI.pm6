@@ -1,5 +1,6 @@
 use v6;
 use Rdf;
+use Rdf::Blank;
 use Rdf::Node;
 
 package Rdf {
@@ -46,7 +47,7 @@ package Rdf {
       # Check if short iri is a blank node. All blank nodes are written
       # like _:local-name
       #
-      if $short-iri ~~ m/^ '-:' \w+/ {
+      if $short-iri ~~ m/^ '_:' \w+/ {
         $iri = Rdf::Blank.new(:blank-node($short-iri));
       }
 

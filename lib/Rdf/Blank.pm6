@@ -18,5 +18,9 @@ package Rdf {
       $!blank-node = $blank-node;
       self.set-type($Rdf::NODE-BLANK);
     }
+
+    #---------------------------------------------------------------------------
+    #
+    multi method Str (  ) { return $!blank-node; }
   }
 }
