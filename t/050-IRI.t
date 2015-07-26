@@ -28,7 +28,7 @@ subtest {
   isa-ok $i3, 'IRI', 'i3 is IRI';
   is "$i3", 'file://Perl6/Projects/Rdf#abc', "IRI i3 = $i3";
 
-  my Rdf::IRI $i4 .= check-iri('def:abc');
+  my Rdf::Node $i4 = Rdf::IRI.check-iri('def:abc');
   nok $i4, "IRI i4 = undefined";
 
 }, 'Set and test iri';

@@ -37,16 +37,23 @@ package Rdf {
 
     #---------------------------------------------------------------------------
     # Returns an undefined object if iri representation is not known. An IRI
-    # object is returned if a representation is found.
+    # or Blank node object is returned if a representation is found.
     #
-    method check-iri ( Str $short-iri where ?$short-iri --> Rdf::IRI ) {
+    method check-iri ( Str $short-iri where ?$short-iri --> Rdf::Node ) {
 
-      my Rdf::IRI $iri;
+      my Rdf::Node $iri;
+
+      # Check if short iri is a blank node. All blank nodes are written
+      # like _:local-name
+      #
+      if $short-iri ~~ m/^ '-:' \w+/ {
+        $iri = Rdf::Blank.new(:blank-node($short-iri));
+      }
 
       # Check if short iri is a full iri. Check <protocol://>.
       #
-      if $short-iri ~~ m/^ \w+ '://' / {
-        $iri .= new(:iri($short-iri));
+      elsif $short-iri ~~ m/^ \w+ '://' / {
+        $iri = Rdf::IRI.new(:iri($short-iri));
       }
 
       else {
@@ -73,7 +80,7 @@ package Rdf {
         }
 
         if ?$site-iri {
-          $iri .= new(:iri($site-iri ~ $local-name));
+          $iri = Rdf::IRI.new(:iri($site-iri ~ $local-name));
         }
       }
 #say "CI 1: $site-iri, $iri" if ?$iri;
