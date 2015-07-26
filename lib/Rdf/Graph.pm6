@@ -1,6 +1,7 @@
 use v6;
 use Rdf;
 use Rdf::Node;
+use Rdf::IRI;
 
 package Rdf {
 
@@ -10,7 +11,7 @@ package Rdf {
 
     # This objects IRI
     #
-    has $.literal;
+    has Rdf::IRI $.graph;
 
     #---------------------------------------------------------------------------
     #
