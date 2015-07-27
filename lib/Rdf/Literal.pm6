@@ -1,6 +1,5 @@
 use v6;
 use Rdf;
-use Rdf::IRI;
 use Rdf::Node;
 
 package Rdf {
@@ -10,7 +9,7 @@ package Rdf {
   class Literal is Rdf::Node {
 
     has Str $.form;
-    has Rdf::IRI $.datatype;
+    has Str $.datatype;
     has Str $.lang-tag;
 
     #---------------------------------------------------------------------------
@@ -20,12 +19,37 @@ package Rdf {
       Str :$form,
       Str :$datatype where $datatype ~~ any(@Rdf::RDF-TYPES),
     ) {
-      my Rdf::IRI $dt .= check-iri($datatype);
-
-      # Check language tag
-
       $!form = $form;
-      $!datatype = $dt;
+      $!datatype = full-iri($datatype);
+
+      self.set-type($Rdf::NODE-LITERAL);
+    }
+
+    #---------------------------------------------------------------------------
+    # Implicit datatype(xsd:string)
+    #
+    multi submethod BUILD ( Str :$form is copy ) {
+
+      # Check if this is a full specification of a literal
+      #
+      if $form ~~ m/ '^^' / {
+        ( my $lform, my $datatype ) = $form.split(/'^^'/);
+        if $lform ~~ m/ '@\w+' $ / {
+          ( $lform, my $ltag) = split(/'@'/);
+          $!lang-tag = $ltag.lc;
+          if $datatype !~~ m/ 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString' / {
+            die "Datatype wrong for language tagged strings";
+          }
+        }
+        
+        $!form = $lform;
+        $!datatype = full-iri($datatype);
+      }
+
+      else {
+        $!form = $form;
+        $!datatype = full-iri($Rdf::STRING);
+      }
 
       self.set-type($Rdf::NODE-LITERAL);
     }
@@ -33,7 +57,7 @@ package Rdf {
     #---------------------------------------------------------------------------
     # Implicit datatype(xsd:string) or datatype('rdf:langString')
     #
-    multi submethod BUILD ( Str :$form is copy, Str :$lang-tag is copy ) {
+    multi submethod xBUILD ( Str :$form is copy, Str :$lang-tag is copy ) {
 
       my Rdf::IRI $dt;
       
@@ -66,17 +90,6 @@ package Rdf {
     }
 
     #---------------------------------------------------------------------------
-    # Shortcuts
-    # new( :$form, :datatype('xsd:integer'))
-    #
-    multi submethod BUILD ( Int :$form ) {
-      $!form = $form.fmt('%s');
-      $!datatype .= check-iri('xsd:integer');
-
-      self.set-type($Rdf::NODE-LITERAL);
-    }
-
-    #---------------------------------------------------------------------------
     #
     method get-form ( ) {
       return $!form;
@@ -96,18 +109,37 @@ package Rdf {
 
     #---------------------------------------------------------------------------
     #
-    method get-value ( ) {
+    method get-value ( --> Str ) {
 
-      my $value = $!form;
+      my Str $value = $!form;
       if $!lang-tag.defined {
         $value ~= "\@$!lang-tag";
       }
 
-      elsif $!datatype !~~ Rdf::IRI.check-iri('xsd:string') {
+      elsif $!datatype !~~ 'xsd:string' {
         $value ~= "^^$!datatype";
       }
 
       return $value;
     }
+
+    #---------------------------------------------------------------------------
+    #
+    multi method Str ( --> Str ) { return self.get-value; }
   }
 }
+
+
+=finish
+
+    #---------------------------------------------------------------------------
+    # Shortcuts
+    # new( :$form, :datatype('xsd:integer'))
+    #
+    multi submethod xBUILD ( Int :$form ) {
+      $!form = $form.fmt('%s');
+      $!datatype .= check-iri('xsd:integer');
+
+      self.set-type($Rdf::NODE-LITERAL);
+    }
+

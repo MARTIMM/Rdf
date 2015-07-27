@@ -1,6 +1,5 @@
 use v6;
 use Rdf;
-use Rdf::Blank;
 use Rdf::Node;
 
 package Rdf {
@@ -15,27 +14,25 @@ package Rdf {
 
     #---------------------------------------------------------------------------
     #
-    submethod BUILD ( Str :$iri ) {
+    submethod BUILD ( Str :$iri where ?$iri ) {
       $!iri = $iri;
       self.set-type($Rdf::NODE-IRI);
     }
 
     #---------------------------------------------------------------------------
     #
-    method prefix (
-      Str :$prefix = ' ',
-      Str :$local-name where $local-name.chars > 1
-    ) {
+    multi method Str ( --> Str ) { return $!iri; }
 
-      if ?$Rdf::prefixes{$prefix} {
-        note "Prefix '$prefix' in use for $Rdf::prefixes{$prefix}";
-      }
+    #---------------------------------------------------------------------------
+    # Getters
+    #
+    method get-iri ( ) { return $!iri; }
+  }
+}
 
-      else {
-        $Rdf::prefixes{$prefix} = $local-name;
-      }
-    }
 
+
+=finish
     #---------------------------------------------------------------------------
     # Returns an undefined object if iri representation is not known. An IRI
     # or Blank node object is returned if a representation is found.
@@ -44,10 +41,16 @@ package Rdf {
 
       my Rdf::Node $iri;
 
+      # Check if short iri is a fully specified literal node.
+      #
+      if $short-iri ~~ m/ '^^' / {
+        $iri = Rdf::Literal.new($short-iri);
+      }
+
       # Check if short iri is a blank node. All blank nodes are written
       # like _:local-name
       #
-      if $short-iri ~~ m/^ '_:' \w+/ {
+      elsif $short-iri ~~ m/^ '_:' \w+/ {
         $iri = Rdf::Blank.new(:blank-node($short-iri));
       }
 
@@ -90,12 +93,16 @@ package Rdf {
 
     #---------------------------------------------------------------------------
     #
-    multi method Str (  ) { return $!iri; }
+    method prefix (
+      Str :$prefix = ' ',
+      Str :$local-name where $local-name.chars > 1
+    ) {
 
-    #---------------------------------------------------------------------------
-    # Getters
-    #
-    method get-iri ( ) { return $!iri; }
-    method get-prefix ( Str $prefix = ' ' ) { return $Rdf::prefixes{$prefix}; }
-  }
-}
+      if ?$Rdf::prefixes{$prefix} {
+        note "Prefix '$prefix' in use for $Rdf::prefixes{$prefix}";
+      }
+
+      else {
+        $Rdf::prefixes{$prefix} = $local-name;
+      }
+    }

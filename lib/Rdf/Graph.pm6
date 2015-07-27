@@ -7,7 +7,7 @@ package Rdf {
 
   #-----------------------------------------------------------------------------
   #
-  class Literal is Rdf::Node {
+  class Graph is Rdf::Node {
 
     # This objects IRI
     #

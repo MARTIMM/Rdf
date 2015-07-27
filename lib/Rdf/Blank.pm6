@@ -21,6 +21,6 @@ package Rdf {
 
     #---------------------------------------------------------------------------
     #
-    multi method Str (  ) { return $!blank-node; }
+    multi method Str ( --> Str ) { return $!blank-node; }
   }
 }

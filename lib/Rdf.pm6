@@ -144,4 +144,60 @@ package Rdf:ver<0.1.0> {
 
   # Cache data into local files
   #
+
+
+  module Rdf-Tools {
+
+    #---------------------------------------------------------------------------
+    #
+    sub prefix (
+      Str :$prefix = ' ',
+      Str :$local-name where $local-name.chars >= 1
+    ) is export {
+
+      if ?$prefixes{$prefix} {
+        note "Prefix '$prefix' in use for $prefixes{$prefix}";
+      }
+
+      else {
+        $prefixes{$prefix} = $local-name;
+      }
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    sub get-prefix ( Str $prefix = ' ' ) is export {
+      return $prefixes{$prefix};
+    }
+
+    #---------------------------------------------------------------------------
+    # Convert short notation iri into full iri format
+    # e.g. xsd:long --> http://www.w3.org/2001/XMLSchema#long
+    #
+    sub full-iri ( Str $iri-string --> Str ) is export {
+
+      # An iri can be a short iri of only the <local name> or a
+      # <prefix:local name> combination. If split returns two results its the
+      # second otherwise its the first.
+      #
+      ( my $prefix, my $local-name) = $iri-string.split(':');
+
+      # prefix and localname if there is a ':'
+      #
+      my Str $site-iri;
+      if ?$local-name #`{{Then there is also a prefix}} {
+        $site-iri = $prefixes{$prefix} ~ $local-name
+          if $prefixes{$prefix}:exists;
+      }
+
+      # Only localname in prefix, prefix is default, use prefix ' '.
+      #
+      else {
+        $site-iri = $prefixes{' '} ~ $prefix
+          if $prefixes{' '}:exists;
+      }
+
+      return $site-iri;
+    }
+  }
 }

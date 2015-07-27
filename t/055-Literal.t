@@ -13,6 +13,20 @@ subtest {
      '10^^http://www.w3.org/2001/XMLSchema#long',
      "Value is '{$lit.get-value}'";
 
+
+}, 'literal';
+
+#-------------------------------------------------------------------------------
+# Cleanup
+#
+done();
+exit(0);
+
+=finish
+#-------------------------------------------------------------------------------
+subtest {
+  my Rdf::Literal $lit;
+
   $lit .= new( :form('78'), :datatype($Rdf::SHORT));
   is $lit.get-value,
      '78^^http://www.w3.org/2001/XMLSchema#short',
@@ -40,9 +54,3 @@ subtest {
   is $lit.get-value, 'hoeperde poep@nl', "Value is '{$lit.get-value}'";
 
 }, 'literal';
-
-#-------------------------------------------------------------------------------
-# Cleanup
-#
-done();
-exit(0);
