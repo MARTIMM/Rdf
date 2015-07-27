@@ -14,20 +14,34 @@ package Rdf {
     has Str $.lang-tag;
 
     #---------------------------------------------------------------------------
+    # Explicit datatype
     #
-    multi submethod BUILD ( Str :$form, Str :$datatype, Str :$lang-tag is copy ) {
-
-      # Normalize to lowercase
-      #
-      $lang-tag.lc if $lang-tag.defined;
-
-      my Rdf::IRI $dt .= check-iri($datatype) if $datatype.defined;
-      $dt .= check-iri('xs:langString') if $lang-tag.defined;
-      $dt .= check-iri('xs:string') unless $dt.defined;
+    multi submethod BUILD (
+      Str :$form,
+      Str :$datatype where $datatype ~~ any(@Rdf::RDF-TYPES),
+    ) {
+      my Rdf::IRI $dt .= check-iri($datatype);
 
       # Check data type
 
       # Check language tag
+
+      $!form = $form;
+      $!datatype = $dt;
+
+      self.set-type($Rdf::NODE-LITERAL);
+    }
+
+    #---------------------------------------------------------------------------
+    # Implicit datatype(xsd:string) or datatype('rdf:langString')
+    #
+    multi submethod BUILD ( Str :$form, Str :$lang-tag is copy ) {
+
+      # Normalize to lowercase
+      #
+      $lang-tag.lc if $lang-tag.defined;
+      my Rdf::IRI $dt .= check-iri($Rdf::LANGSTRING) if $lang-tag.defined;
+      $dt .= check-iri($Rdf::STRING) unless $dt.defined;
 
       $!form = $form;
       $!datatype = $dt;
@@ -38,10 +52,13 @@ package Rdf {
 
     #---------------------------------------------------------------------------
     # Shortcuts
+    # new( :$form, :datatype('xsd:integer'))
     #
     multi submethod BUILD ( Int :$form ) {
       $!form = $form.fmt('%s');
-      $!datatype .= check-iri('xs:integer');
+      $!datatype .= check-iri('xsd:integer');
+
+      self.set-type($Rdf::NODE-LITERAL);
     }
 
     #---------------------------------------------------------------------------
@@ -71,7 +88,7 @@ package Rdf {
         $value ~= "\@$!lang-tag";
       }
 
-      elsif $!datatype !~~ Rdf::IRI.check-iri('xs:string') {
+      elsif $!datatype !~~ Rdf::IRI.check-iri('xsd:string') {
         $value ~= "^^$!datatype";
       }
 
