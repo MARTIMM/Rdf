@@ -22,8 +22,6 @@ package Rdf {
     ) {
       my Rdf::IRI $dt .= check-iri($datatype);
 
-      # Check data type
-
       # Check language tag
 
       $!form = $form;
@@ -35,17 +33,34 @@ package Rdf {
     #---------------------------------------------------------------------------
     # Implicit datatype(xsd:string) or datatype('rdf:langString')
     #
-    multi submethod BUILD ( Str :$form, Str :$lang-tag is copy ) {
+    multi submethod BUILD ( Str :$form is copy, Str :$lang-tag is copy ) {
 
-      # Normalize to lowercase
+      my Rdf::IRI $dt;
+      
+      # Check if this is a full specification of a literal
       #
-      $lang-tag.lc if $lang-tag.defined;
-      my Rdf::IRI $dt .= check-iri($Rdf::LANGSTRING) if $lang-tag.defined;
-      $dt .= check-iri($Rdf::STRING) unless $dt.defined;
+      if $form ~~ m/ '^^' / and ! $lang-tag.defined {
+        ( my $lform, my $datatype ) = $form.split(/'^^'/);
+        if $lform ~~ m/ '@\w+' $ / {
+          ( $lform, my $ltag) = split(/'@'/);
+          $!lang-tag = $ltag.lc;
+        }
 
-      $!form = $form;
-      $!datatype = $dt;
-      $!lang-tag = $lang-tag if $lang-tag.defined;
+        $!form = $lform;
+        $!datatype .= check-iri($datatype);
+      }
+
+      else {
+        # Normalize to lowercase
+        #
+        $lang-tag.lc if $lang-tag.defined;
+        $dt .= check-iri($Rdf::LANGSTRING) if $lang-tag.defined;
+        $dt .= check-iri($Rdf::STRING) unless $dt.defined;
+
+        $!form = $form;
+        $!datatype = $dt;
+        $!lang-tag = $lang-tag if $lang-tag.defined;
+      }
 
       self.set-type($Rdf::NODE-LITERAL);
     }

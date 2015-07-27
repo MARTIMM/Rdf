@@ -18,6 +18,11 @@ subtest {
      '78^^http://www.w3.org/2001/XMLSchema#short',
      "Value is '{$lit.get-value}'";
 
+  $lit .= new( :form([~] '1957', '^^', $Rdf::GYEAR));
+  is $lit.get-value,
+     '1957^^http://www.w3.org/2001/XMLSchema#gYear',
+     "Value is '{$lit.get-value}'";
+
   $lit .= new(:form(11));
   is $lit.get-value,
      '11^^http://www.w3.org/2001/XMLSchema#integer',
