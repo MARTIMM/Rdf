@@ -17,8 +17,8 @@ package Rdf:ver<0.1.0> {
   # Core types
   constant $STRING              = 'xsd:string';
   constant $BOOLEAN             = 'xsd:boolean';
-  constant $DECIMAL             = 'xsd:decimal';
-  constant $INTEGER             = 'xsd:integer';
+  constant $DECIMAL             = 'xsd:decimal';        # Arbitrary precision
+  constant $INTEGER             = 'xsd:integer';        # Arbitrary precision
 
   # IEEE floating-pointnumbers
   constant $DOUBLE              = 'xsd:double';
@@ -31,7 +31,7 @@ package Rdf:ver<0.1.0> {
   constant $DATETIMESTAMP       = 'xsd:dateTimeStamp';
 
   # Recurring and partial dates
-  constant $GYEAR               = 'xsd:gYear';
+  constant $GYEAR               = 'xsd:gYear';          # Gregorian
   constant $GMONTH              = 'xsd:gMonth';
   constant $GDAY                = 'xsd:gDay';
   constant $GYEARMONTH          = 'xsd:gYearMonth';
@@ -49,10 +49,10 @@ package Rdf:ver<0.1.0> {
   constant $UNSIGNEDSHORT       = 'xsd:unsignedShort';
   constant $UNSIGNEDINT         = 'xsd:unsignedInt';
   constant $UNSIGNEDLONG        = 'xsd:unsignedLong';
-  constant $POSITIVEINTEGER     = 'xsd:positiveInteger';
-  constant $NONNEGATIVEINTEGER  = 'xsd:nonNegativeInteger';
-  constant $NEGATIVEINTEGER     = 'xsd:negativeInteger';
-  constant $NONPOSITIVEINTEGER  = 'xsd:nonPositiveInteger';
+  constant $POSITIVEINTEGER     = 'xsd:positiveInteger';        # >  0
+  constant $NONNEGATIVEINTEGER  = 'xsd:nonNegativeInteger';     # >= 0
+  constant $NEGATIVEINTEGER     = 'xsd:negativeInteger';        # <  0
+  constant $NONPOSITIVEINTEGER  = 'xsd:nonPositiveInteger';     # <= 0
 
   # Encoded binary data
   constant $HEXBINARY           = 'xsd:hexBinary';
@@ -134,7 +134,7 @@ package Rdf:ver<0.1.0> {
     $prefixes<rdf rdfs xsd foaf schema dcterms wd> = @(
       'http://www.w3.org/1999/02/22-rdf-syntax-ns#', # rdf
       'http://www.w3.org/2000/01/rdf-schema#',       # rdfs
-      'http://www.w3.org/2001/XMLSchema#',           # xs       data types
+      'http://www.w3.org/2001/XMLSchema#',           # xsd      data types
       'http://xmlns.com/foaf/0.1/',                  # foaf     social network
       'http://schema.org/',                          # schema
       'http://purl.org/dc/terms/',                   # dcterms  Dubin core
