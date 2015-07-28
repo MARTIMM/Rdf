@@ -18,13 +18,13 @@ package Rdf {
       Str $iri-string where $iri-string.chars >= 1
       --> Rdf::Node
     ) {
-    
+
       my Rdf::Node $node;
 
       # Check if short iri is a fully specified literal node.
       #
       if $iri-string ~~ m/ '^^' / {
-        $node = Rdf::Literal.new(:form($iri-string));
+        $node = Rdf::Literal.new(:lexical-form($iri-string));
       }
 
       # Check if short iri is a blank node. All blank nodes are written
@@ -39,12 +39,12 @@ package Rdf {
       elsif $iri-string ~~ m/^ \w+ '://' / {
         $node = Rdf::IRI.new(:iri($iri-string));
       }
-      
+
       else {
         my $fi = full-iri($iri-string);
         $node = Rdf::IRI.new(:iri($fi)) if ?$fi;
       }
-      
+
       return $node;
     }
 
@@ -54,7 +54,7 @@ package Rdf {
       Str $iri-string where $iri-string ~~ m/ ^ '_:' \w+ /
       --> Rdf::Blank
     ) {
-      return Rdf::Literal.new(:form($iri-string));
+      return Rdf::Literal.new(:lexical-form($iri-string));
       return Rdf::Blank.new(:blank-node($iri-string));
     }
 

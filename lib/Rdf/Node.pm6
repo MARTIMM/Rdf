@@ -6,6 +6,8 @@ package Rdf {
   class Node {
 
     has Int $!type;
+    has Str $!value;
+    has Str $!short-value;
 
     #---------------------------------------------------------------------------
     #
@@ -22,6 +24,28 @@ package Rdf {
     ) {
       $!type = $type;
     }
+
+    #---------------------------------------------------------------------------
+    #
+    method set-value (
+      Str $value where $value.chars > 0
+    ) {
+      $!value = $value;
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    method set-short-value (
+      Str $value where $value.chars > 0
+    ) {
+      $!short-value = $short-value;
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    method get-value ( --> Str ) { return $!value; }
+    method get-short-value ( --> Str ) { return $!short-value; }
+    multi method Str ( --> Str ) { return $!value; }
   }
 }
 

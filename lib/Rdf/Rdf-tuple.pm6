@@ -1,7 +1,7 @@
 use v6;
 use Rdf;
-use Rdf::IRI;
 use Rdf::Node;
+use Rdf::Node-builder;
 
 package Rdf {
 
@@ -24,20 +24,46 @@ package Rdf {
       $!predicate = $predicate;
       $!object = $object;
     }
+
+    #---------------------------------------------------------------------------
+    #
+    method get-subject ( ) { return $!subject; }
+    method get-predicate ( ) { return $!predicate; }
+    method get-object ( ) { return $!object ; }
   }
 
+  #-----------------------------------------------------------------------------
+  #
   module Tuple-Tools {
-    sub tuple (
-      Rdf::Node $subject,
-      Rdf::Node $predicate,
-      Rdf::Node $object
-      --> Rdf::Tuple
+
+    #---------------------------------------------------------------------------
+    #
+    multi sub tuple (
+      Str $subject,
+      Str $predicate,
+      Str $object
+      --> Rdf::Rdf-tuple
     ) is export {
-      return Rdf::Tuple.new(
-        Rdf::IRI.check-iri($subject),
-        Rdf::IRI.check-iri($predicate),
-        Rdf::IRI.check-iri($object)
+      return Rdf::Rdf-tuple.new(
+        :subject(Rdf::Node-builder.create($subject)),
+        :predicate(Rdf::Node-builder.create($predicate)),
+        :object(Rdf::Node-builder.create($object))
       );
-    } 
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    multi sub tuple (
+      Rdf::Rdf-tuple $tuple,
+      Str $predicate,
+      Str $object
+      --> Rdf::Rdf-tuple
+    ) is export {
+      return Rdf::Rdf-tuple.new(
+        :subject($tuple.get-subject),
+        :predicate(Rdf::Node-builder.create($predicate)),
+        :object(Rdf::Node-builder.create($object))
+      );
+    }
   }
 }
