@@ -67,9 +67,44 @@ package Rdf:ver<0.1.0> {
   constant $NAME                = 'xsd:Name';
   constant $NCNAME              = 'xsd:NCName';
 
-  # Some from RFD (http://www.w3.org/1999/02/22-rdf-syntax-ns)
+  # Some from RDF (http://www.w3.org/1999/02/22-rdf-syntax-ns) and
+  # RDFS (http://www.w3.org/2000/01/rdf-schema#)
+  #
+  # RDF Classes
+  constant $RESOURCE            = 'rdfs:Resource';
+  constant $LITERAL             = 'rdfs:Literal';
   constant $LANGSTRING          = 'rdf:langString';
   constant $HTML                = 'rdf:HTML';
+  constant $XMLLITERAL          = 'rdf:XMLLiteral';
+  constant $CLASS               = 'rdfs:Class';
+  constant $PROPERTY            = 'rdf:Property';
+  constant $DATATYPE            = 'rdfs:Datatype';
+  constant $STATEMENT           = 'rdf:Statement';
+  constant $BAG                 = 'rdf:Bag';
+  constant $SEQ                 = 'rdf:Seq';
+  constant $ALT                 = 'rdf:Alt';
+  constant $CONTAINER           = 'rdfs:Container';
+  constant $CONTAINERMEMBERSHIPPROPERTY = 'rdfs:ContainerMembershipProperty';
+  constant $LIST                = 'rdf:List';
+
+  # RDF Properties
+  constant $TYPE                = 'rdf:type';
+  constant $SUBCLASSOF          = 'rdfs:subClassOf';
+  constant $SUBPROPERTYOF       = 'rdfs:subPropertyOf';
+  constant $DOMAIN              = 'rdfs:domain';
+  constant $RANGE               = 'rdfs:range';
+  constant $LABEL               = 'rdfs:label';
+  constant $COMMENT             = 'rdfs:comment';
+  constant $MEMBER              = 'rdfs:member';
+  constant $FIRST               = 'rdf:first';
+  constant $REST                = 'rdf:rest';
+  constant $SEEALSO             = 'rdfs:seeAlso';
+  constant $ISDEFINEDBY         = 'rdfs:isDefinedBy';
+  constant $VALUE               = 'rdf:value';
+  constant $SUBJECT             = 'rdf:subject';
+  constant $PREDICATE           = 'rdf:predicate';
+  constant $OBJECT              = 'rdf:object';
+
 
   # Array of types to check for
   constant @RDF-TYPES           = (
@@ -119,8 +154,38 @@ package Rdf:ver<0.1.0> {
     $NAME,
     $NCNAME,
 
+    $RESOURCE,
+    $LITERAL,
     $LANGSTRING,
     $HTML,
+    $XMLLITERAL,
+    $CLASS,
+    $PROPERTY,
+    $DATATYPE,
+    $STATEMENT,
+    $BAG,
+    $SEQ,
+    $ALT,
+    $CONTAINER,
+    $CONTAINERMEMBERSHIPPROPERTY,
+    $LIST,
+
+    $TYPE,
+    $SUBCLASSOF,
+    $SUBPROPERTYOF,
+    $DOMAIN,
+    $RANGE,
+    $LABEL,
+    $COMMENT,
+    $MEMBER,
+    $FIRST,
+    $REST,
+    $SEEALSO,
+    $ISDEFINEDBY,
+    $VALUE,
+    $SUBJECT,
+    $PREDICATE,
+    $OBJECT,
   );
 
   #-----------------------------------------------------------------------------
