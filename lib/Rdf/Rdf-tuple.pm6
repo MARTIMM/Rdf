@@ -54,12 +54,15 @@ package Rdf {
       my Rdf::Node $s = $subject ~~ Rdf::Rdf-tuple
         ?? $subject.get-subject
         !! Rdf::Node-builder.create($subject);
+      die "Node for $subject is not created" unless $s.defined;
 
       my Rdf::Node $p = Rdf::Node-builder.create($predicate);
+      die "Node for $predicate is not created" unless $p.defined;
 
       my Rdf::Node $o = $object ~~ Rdf::Rdf-tuple
         ?? $object.get-subject
         !! Rdf::Node-builder.create($object);
+      die "Node for $object is not created" unless $o.defined;
 
       return Rdf::Rdf-tuple.new( :subject($s), :predicate($p), :object($o));
     }

@@ -1,5 +1,5 @@
 .directory
 *.pdf
 *.xml
-x.pl6
+x*.pl6
 *~

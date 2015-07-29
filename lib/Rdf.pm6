@@ -205,6 +205,8 @@ package Rdf:ver<0.1.0>:auth<https://github.com/MARTIMM> {
       'http://purl.org/dc/terms/',                   # dcterms  Dubin core
       'http://www.wikidata.org/entity/',             # wd       Wiki data
     );
+
+    $prefixes{' '} = 'file:///' ~ $*PROGRAM-NAME ~ '#';
   }
 
   # Cache data into local files
@@ -224,9 +226,9 @@ package Rdf:ver<0.1.0>:auth<https://github.com/MARTIMM> {
         note "Prefix '$prefix' in use for $prefixes{$prefix}";
       }
 
-      else {
+#      else {
         $prefixes{$prefix} = $local-name;
-      }
+#      }
     }
 
     #---------------------------------------------------------------------------
