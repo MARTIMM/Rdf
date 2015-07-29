@@ -192,6 +192,7 @@ package Rdf:ver<0.1.0> {
   # Prefixes are visible in every OWL object;
   #
   our $prefixes = Hash.new;
+  our $reversed-prefixes = Hash.new;
 
   # Set some known prefixes with their iri
   #
@@ -233,6 +234,25 @@ package Rdf:ver<0.1.0> {
     #
     sub get-prefix ( Str $prefix = ' ' ) is export {
       return $prefixes{$prefix};
+    }
+
+    #---------------------------------------------------------------------------
+    # Convert log notation iri to a short one
+    #
+    sub short-iri ( Str $full-iri is copy --> Str ) is export {
+
+#say "FI: $full-iri";
+      for $prefixes.keys -> $k {
+#say "KV: $k => $prefixes{$k}";
+        my $uri = $prefixes{$k};
+        if $full-iri ~~ m/ $uri / {
+          $full-iri ~~ s/ $uri /$k:/;
+          last;
+        }
+      }
+
+#say "SI: $full-iri";
+      return $full-iri;
     }
 
     #---------------------------------------------------------------------------

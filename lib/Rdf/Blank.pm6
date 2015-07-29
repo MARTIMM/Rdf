@@ -15,13 +15,9 @@ package Rdf {
     #---------------------------------------------------------------------------
     #
     submethod BUILD ( :$blank-node is copy ) {
-      $blank-node ~~ s/^ '_:' //;
       self.set-value($blank-node);
+      self.set-short-value = $blank-node;
       self.set-type($Rdf::NODE-BLANK);
     }
-
-    #---------------------------------------------------------------------------
-    #
-    multi method Str ( --> Str ) { return "_:{self.get-value}"; }
   }
 }

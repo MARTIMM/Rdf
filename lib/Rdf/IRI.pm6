@@ -16,17 +16,10 @@ package Rdf {
     #
     submethod BUILD ( Str :$iri where ?$iri ) {
       $!iri = $iri;
+      self.set-value($iri);
+      self.set-short-value(short-iri($iri));
       self.set-type($Rdf::NODE-IRI);
     }
-
-    #---------------------------------------------------------------------------
-    #
-    multi method Str ( --> Str ) { return $!iri; }
-
-    #---------------------------------------------------------------------------
-    # Getters
-    #
-    method get-iri ( ) { return $!iri; }
   }
 }
 

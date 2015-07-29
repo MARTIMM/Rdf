@@ -29,7 +29,11 @@ package Rdf {
     #
     method get-subject ( ) { return $!subject; }
     method get-predicate ( ) { return $!predicate; }
-    method get-object ( ) { return $!object ; }
+    method get-object ( ) { return $!object; }
+
+#    method get-s-subject ( ) { return short-iri($!subject); }
+#    method get-s-predicate ( ) { return short-iri($!predicate); }
+#    method get-s-object ( ) { return short-iri($!object); }
   }
 
   #-----------------------------------------------------------------------------

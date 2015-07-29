@@ -44,6 +44,7 @@ package Rdf {
       }
 
       self.set-value($value);
+      self.set-short-value(short-iri($value));
       self.set-type($Rdf::NODE-LITERAL);
     }
 
@@ -83,6 +84,7 @@ package Rdf {
       }
 
       self.set-value($value);
+      self.set-short-value(short-iri($value));
       self.set-type($Rdf::NODE-LITERAL);
     }
 
@@ -113,6 +115,7 @@ package Rdf {
       }
 
       self.set-value($value);
+      self.set-short-value(short-iri($value));
       self.set-type($Rdf::NODE-LITERAL);
     }
 
@@ -125,6 +128,7 @@ package Rdf {
       $!datatype = Rdf::Rdf-Tools.full-iri('xsd:integer');
 
       self.set-value($!lexical-form ~ '^^' ~ $!datatype);
+      self.set-short-value(short-iri($!lexical-form ~ '^^' ~ $!datatype));
       self.set-type($Rdf::NODE-LITERAL);
     }
 

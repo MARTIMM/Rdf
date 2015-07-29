@@ -36,7 +36,7 @@ package Rdf {
     #---------------------------------------------------------------------------
     #
     method set-short-value (
-      Str $value where $value.chars > 0
+      Str $short-value where $short-value.chars > 0
     ) {
       $!short-value = $short-value;
     }
