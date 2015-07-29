@@ -32,7 +32,7 @@ package Rdf {
       }
 
       $!lexical-form = $lexical-form;
-      $!datatype = Rdf::Rdf-Tools.full-iri($datatype);
+      $!datatype = full-iri($datatype);
 
       my Str $value = $!lexical-form;   #   qq@"$!lexical-form"@;
       if $!lang-tag.defined {
@@ -51,11 +51,19 @@ package Rdf {
     #---------------------------------------------------------------------------
     # Implicit datatype(xsd:string) or specified in full datatype IRI
     #
-    multi submethod BUILD ( Str :$lexical-form ) {
+    multi submethod BUILD ( Str :$lexical-form, Str :$lang-tag ) {
+
+      # Normalize to lowercase
+      #
+      if ?$lang-tag {
+        $!lang-tag = $lang-tag.lc;
+        $!lexical-form = $lexical-form;
+        $!datatype = full-iri($Rdf::LANGSTRING);
+      }
 
       # Check if this is a full specification of a literal
       #
-      if $lexical-form ~~ m/ '^^' / {
+      elsif $lexical-form ~~ m/ '^^' / {
         ( my $lform, my $datatype ) = $lexical-form.split(/'^^'/);
         if $lform ~~ m/ '@\w+' $ / {
           ( $lform, my $ltag) = split(/'@'/);
@@ -71,9 +79,11 @@ package Rdf {
 
       else {
         $!lexical-form = $lexical-form;
-        $!datatype = Rdf::Rdf-Tools.full-iri($Rdf::STRING);
+        $!datatype = full-iri($Rdf::STRING);
       }
 
+      # Strins and language tagged string don't need datatypes
+      #
       my Str $value = $!lexical-form;
       if $!lang-tag.defined {
         $value ~= "\@$!lang-tag";
@@ -98,8 +108,8 @@ package Rdf {
       # Normalize to lowercase
       #
       $lang-tag.lc if $lang-tag.defined;
-      $dt = Rdf::Rdf-Tools.full-iri($Rdf::LANGSTRING) if $lang-tag.defined;
-      $dt = Rdf::Rdf-Tools.full-iri($Rdf::STRING) unless $dt.defined;
+      $dt =full-iri($Rdf::LANGSTRING) if $lang-tag.defined;
+      $dt =full-iri($Rdf::STRING) unless $dt.defined;
 
       $!lexical-form = $lexical-form;
       $!datatype = $dt;
@@ -123,9 +133,9 @@ package Rdf {
     # Shortcuts
     # new( :$lexical-form, :datatype('xsd:integer'))
     #
-    multi submethod xBUILD ( Int :$lexical-form ) {
+    multi submethod BUILD ( Int :$lexical-form ) {
       $!lexical-form = $lexical-form.fmt('%s');
-      $!datatype = Rdf::Rdf-Tools.full-iri('xsd:integer');
+      $!datatype = full-iri('xsd:integer');
 
       self.set-value($!lexical-form ~ '^^' ~ $!datatype);
       self.set-short-value(short-iri($!lexical-form ~ '^^' ~ $!datatype));

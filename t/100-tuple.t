@@ -4,10 +4,15 @@ use Test;
 use Rdf;
 use Rdf::Rdf-tuple;
 
+prefix(local-name => 'file://Perl6/Projects/Rdf#');
+
 #-------------------------------------------------------------------------------
 subtest {
-  my $t = tuple( );
+  my Rdf::Rdf-tuple $t = tuple( 'Mary', $Rdf::TYPE, 'foaf:person');
+  is $t.subject.get-value, 'file://Perl6/Projects/Rdf#Mary', $t.subject.get-value;
+  is $t.subject.get-short-value, 'Mary', $t.subject.get-short-value;
 
+say "T: ", $t.perl;
 }, 'tuple';
 
 #-------------------------------------------------------------------------------

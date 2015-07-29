@@ -1,4 +1,4 @@
-package Rdf:ver<0.1.0> {
+package Rdf:ver<0.1.0>:auth<https://github.com/MARTIMM> {
 
   #-----------------------------------------------------------------------------
   # Definition of used constants

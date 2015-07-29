@@ -17,7 +17,13 @@ package Rdf {
     submethod BUILD ( Str :$iri where ?$iri ) {
       $!iri = $iri;
       self.set-value($iri);
-      self.set-short-value(short-iri($iri));
+      
+      # Remove ' :' if it is a default prefix for the iri
+      #
+      my $si = short-iri($iri);
+      $si ~~ s/^ ' :' //;
+      self.set-short-value($si);
+
       self.set-type($Rdf::NODE-IRI);
     }
   }
