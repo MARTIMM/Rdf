@@ -16,7 +16,7 @@ package Rdf {
     #
     submethod BUILD ( :$blank-node is copy ) {
       self.set-value($blank-node);
-      self.set-short-value = $blank-node;
+      self.set-short-value($blank-node);
       self.set-type($Rdf::NODE-BLANK);
     }
   }

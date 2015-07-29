@@ -192,7 +192,6 @@ package Rdf:ver<0.1.0> {
   # Prefixes are visible in every OWL object;
   #
   our $prefixes = Hash.new;
-  our $reversed-prefixes = Hash.new;
 
   # Set some known prefixes with their iri
   #

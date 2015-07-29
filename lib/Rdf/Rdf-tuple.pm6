@@ -21,8 +21,13 @@ package Rdf {
       :$object where $object.get-type ~~ any($Rdf::NODE-Literal,$Rdf::NODE-IRI,$Rdf::NODE-BLANK)
     ) {
       $!subject = $subject;
+      $subject.save-tuple(self);
+
       $!predicate = $predicate;
+      $predicate.save-tuple(self);
+
       $!object = $object;
+      $object.save-tuple(self);
     }
 
     #---------------------------------------------------------------------------
@@ -30,10 +35,6 @@ package Rdf {
     method get-subject ( ) { return $!subject; }
     method get-predicate ( ) { return $!predicate; }
     method get-object ( ) { return $!object; }
-
-#    method get-s-subject ( ) { return short-iri($!subject); }
-#    method get-s-predicate ( ) { return short-iri($!predicate); }
-#    method get-s-object ( ) { return short-iri($!object); }
   }
 
   #-----------------------------------------------------------------------------
@@ -41,33 +42,26 @@ package Rdf {
   module Tuple-Tools {
 
     #---------------------------------------------------------------------------
+    # Create a 3-tuple of a subject - predicate - object relationship
     #
-    multi sub tuple (
-      Str $subject,
+    sub tuple (
+      $subject where $subject ~~ any(Str,Rdf::Rdf-tuple),
       Str $predicate,
-      Str $object
+      $object where $object ~~ any(Str,Rdf::Rdf-tuple)
       --> Rdf::Rdf-tuple
     ) is export {
-      return Rdf::Rdf-tuple.new(
-        :subject(Rdf::Node-builder.create($subject)),
-        :predicate(Rdf::Node-builder.create($predicate)),
-        :object(Rdf::Node-builder.create($object))
-      );
-    }
 
-    #---------------------------------------------------------------------------
-    #
-    multi sub tuple (
-      Rdf::Rdf-tuple $tuple,
-      Str $predicate,
-      Str $object
-      --> Rdf::Rdf-tuple
-    ) is export {
-      return Rdf::Rdf-tuple.new(
-        :subject($tuple.get-subject),
-        :predicate(Rdf::Node-builder.create($predicate)),
-        :object(Rdf::Node-builder.create($object))
-      );
+      my Rdf::Node $s = $subject ~~ Rdf::Rdf-tuple
+        ?? $subject.get-subject
+        !! Rdf::Node-builder.create($subject);
+
+      my Rdf::Node $p = Rdf::Node-builder.create($predicate);
+
+      my Rdf::Node $o = $object ~~ Rdf::Rdf-tuple
+        ?? $object.get-subject
+        !! Rdf::Node-builder.create($object);
+
+      return Rdf::Rdf-tuple.new( :subject($s), :predicate($p), :object($o));
     }
   }
 }
