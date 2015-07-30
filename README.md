@@ -40,7 +40,11 @@ That last thing would prove to be difficult, but we'll see.
 * XML
 * Semi-xml
 * JSON-LD
+
 * Turtle
+  [x] @base
+  [x] @prefix
+  [x] 3-tuple or subject predicate and objects
 
 
 ## Changes

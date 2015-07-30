@@ -79,6 +79,11 @@ say "Set url: $!url";
         $s = $!base ~ $!url;
       }
       
+      elsif ~$match ~~ m/ ^ ':' / {
+        $s = $!iri;
+        $s ~~ s/ ':' //;
+      }
+      
       elsif ~$match ~~ m/ ':' / {
         $s = $!iri;
       }
@@ -97,6 +102,11 @@ say "Subject ", full-iri($!subject);
         $p = $!base ~ $!url;
       }
       
+      elsif ~$match ~~ m/ ^ ':' / {
+        $p = $!iri;
+        $p ~~ s/ ':' //;
+      }
+      
       elsif ~$match ~~ m/ ':' / {
         $p = $!iri;
       }
@@ -111,6 +121,11 @@ say "Predicate ", full-iri($!predicate);
       my Str $o;
       if ~$match ~~ m/ ^ '<' / {
         $o = $!base ~ $!url;
+      }
+      
+      elsif ~$match ~~ m/ ^ ':' / {
+        $o = $!iri;
+        $o ~~ s/ ':' //;
       }
       
       elsif ~$match ~~ m/ ':' / {
