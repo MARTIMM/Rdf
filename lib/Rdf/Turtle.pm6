@@ -12,6 +12,7 @@ package Rdf {
   #
   class Turtle {
 
+    has Rdf::Turtle::Grammar $.grammar;
     has Rdf::Turtle::Actions $.actions;
 
     #---------------------------------------------------------------------------
@@ -43,9 +44,17 @@ package Rdf {
 
       # Parse the content. Parse can be recursively called
       #
+      $!grammar .= new;
       $!actions .= new;
-      die "Parse error"
-        unless Rdf::Turtle::Grammar.parse( $content, :actions($!actions));
+      if ! $!grammar.parse( $content, :actions($!actions)) {
+        if $Rdf::seen-eol {
+          die "Error parsing content";
+        }
+        
+        else {
+          die "Error parsing content, perhaps forgot to end the line with a '.'?";
+        }
+      }
     }
   }
 }
