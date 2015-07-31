@@ -64,7 +64,7 @@ say ?$!prefix
 
     #---------------------------------------------------------------------------
     #
-    method prefix-url ( $match ) {
+    method relative-uri ( $match ) {
 
       $!url = ~$match;
 say "Set url: $!url";
@@ -138,7 +138,7 @@ say "Object ", full-iri($!object);
 
     #---------------------------------------------------------------------------
     #
-    method iri ( $match ) {
+    method resource ( $match ) {
       $!iri = ~$match;
     }
 
@@ -152,6 +152,7 @@ say "Object ", full-iri($!object);
     #
     method literal ( $match ) {
       $!literal = ~$match;
+say "Literal ", ~$match;
     }
   }
 }
