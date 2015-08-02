@@ -140,6 +140,8 @@ say "Object ", full-iri($!object);
     #
     method resource ( $match ) {
       $!iri = ~$match;
+
+say "Resource $match";
     }
 
     #---------------------------------------------------------------------------

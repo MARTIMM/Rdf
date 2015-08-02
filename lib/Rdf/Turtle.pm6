@@ -21,7 +21,7 @@ package Rdf {
 
       $!actions = Rdf::Turtle::Actions.new(:init);
       my $text = slurp($filename);
-      self.parse(:content($text));
+      return self.parse(:content($text));
     }
 
     #-----------------------------------------------------------------------------

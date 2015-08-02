@@ -42,6 +42,8 @@ That last thing would prove to be difficult, but we'll see.
 * JSON-LD
 
 * Turtle
+  [x] empty turtle document
+  [x] comment on top level
   [x] @base
   [x] @prefix
   [x] 3-tuple or subject predicate and objects
