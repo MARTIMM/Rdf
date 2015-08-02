@@ -1,6 +1,6 @@
 use v6;
 use Rdf;
-use Grammar::Tracer;
+#use Grammar::Tracer;
 
 package Rdf {
 
@@ -153,7 +153,11 @@ package Rdf {
     }
 
     rule e-character { <character> | <[\"\>\t\n\r]> }
-    rule u-character { <character>  }
+    rule u-character { <character> | '"' | '\>' }     # '>' must be escaped
+    rule s-character { <character> | '>' | '\"' }     # '"' must be escaped
+    rule l-character { <echaracter> | '\"' }
+    
+    rule hex { <[0..9a..fA..F]> }
   }
 }
 

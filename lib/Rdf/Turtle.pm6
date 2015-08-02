@@ -17,17 +17,11 @@ package Rdf {
 
     #---------------------------------------------------------------------------
     #
-    method parse-file ( str :$filename ) {
+    method parse-file ( str :$filename where $filename.IO ~~ :r ) {
 
-      if $filename.IO ~~ :r {
-        $!actions = Rdf::Turtle::Actions.new(:init);
-        my $text = slurp($filename);
-        self.parse(:content($text));
-      }
-      
-      else {
-        die "File $filename not found";
-      }
+      $!actions = Rdf::Turtle::Actions.new(:init);
+      my $text = slurp($filename);
+      self.parse(:content($text));
     }
 
     #-----------------------------------------------------------------------------
@@ -46,15 +40,7 @@ package Rdf {
       #
       $!grammar .= new;
       $!actions .= new;
-      if ! $!grammar.parse( $content, :actions($!actions)) {
-        if $Rdf::seen-eol {
-          die "Error parsing content";
-        }
-        
-        else {
-          die "Error parsing content, perhaps forgot to end the line with a '.'?";
-        }
-      }
+      return $!grammar.parse( $content, :actions($!actions));
     }
   }
 }
