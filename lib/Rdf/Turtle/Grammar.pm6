@@ -1,6 +1,6 @@
 use v6;
 use Rdf;
-use Grammar::Tracer;
+#use Grammar::Tracer;
 
 package Rdf {
 
@@ -89,7 +89,7 @@ package Rdf {
     # number '.' number '^^' data-type-iri
     # '"' text '"' '^^' data-type-iri
     #
-    rule literal {
+    rule token {
         <quoted-string> ( '@' <language> )?
       | <datatype-string>
       | integer
@@ -98,17 +98,17 @@ package Rdf {
       | boolean
     }
 
-    rule datatype-string { <quoted-string> '^^' <resource> }
-    rule integer { <[+-]>? \d+ }
-    rule double {
+    token datatype-string { <quoted-string> '^^' <resource> }
+    token integer { <[+-]>? \d+ }
+    token double {
       <[+-]>? (
           \d+ '.' \d*
         | '.' \d+ <exponent>
         | \d+ <exponent>
       )
     }
-    rule exponent { <[eE]> <[+-]>? \d+ }
-    rule boolean { 'true' | 'false' }
+    token exponent { <[eE]> <[+-]>? \d+ }
+    token boolean { 'true' | 'false' }
 
     # '_:' local-name
     #
@@ -119,22 +119,22 @@ package Rdf {
       | <collection>
     }
 
-    rule node-id { '_:' <name> }
+    token node-id { '_:' <name> }
 
-    rule item-list { <object-item>+ }
     rule collection { '(' <item-list>? ')' }
+    rule item-list { <object-item>+ }
 
     # '<' url '>'
     # prefix ':' local-name
     # prefix ':'
     # ':'
     #
-    rule resource { ( <uri-ref> | <qname> ) }
-    rule uri-ref { '<' ~ '>' <relative-uri> }
+    token resource { ( <uri-ref> | <qname> ) }
+    token uri-ref { '<' ~ '>' <relative-uri> }
     rule qname { <prefix-name>? ':' <name>? }
     token relative-uri { <u-character>* }
 
-    rule language { <[a..z]>+ ( '-' <[a..z0..9]>+ )* }
+    token language { <[a..z]>+ ( '-' <[a..z0..9]>+ )* }
 
     token name-start-char {
         <[a..zA..Z]>
@@ -152,7 +152,7 @@ package Rdf {
       | <[\x203F..\x2040]>
     }
 
-    rule name { (<name-start-char> | '_' ) <name-char>* }
+    token name { (<name-start-char> | '_' ) <name-char>* }
     token prefix-name { <name-start-char> <name-char>* }
 
     rule quoted-string { <string> | <long-string> }

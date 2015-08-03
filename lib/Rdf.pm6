@@ -1,5 +1,6 @@
 package Rdf:ver<0.1.0>:auth<https://github.com/MARTIMM> {
 
+if 0 {
   #-----------------------------------------------------------------------------
   # Definition of used constants
   # Node types
@@ -187,6 +188,10 @@ package Rdf:ver<0.1.0>:auth<https://github.com/MARTIMM> {
     $PREDICATE,
     $OBJECT,
   );
+}
+
+  # Array of types to check for
+  our @RDF-TYPES;
 
   #-----------------------------------------------------------------------------
   # Prefixes are visible in every OWL object;

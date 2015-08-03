@@ -10,7 +10,7 @@ package Rdf {
 
     has Str $.lexical-form;
     has Str $.datatype;
-    has Str $.lang-tag;
+    has Str $.language;
 
     #---------------------------------------------------------------------------
     # Explicit datatype
@@ -18,25 +18,60 @@ package Rdf {
     # When $lexical-form is "some string"@lang-tag $datatype must be
     # rdf:langString.
     #
-    multi submethod BUILD (
+    submethod BUILD (
       Str :$lexical-form,
-      Str :$datatype where $datatype ~~ any(@Rdf::RDF-TYPES),
+      Str :$datatype, # where $datatype ~~ any(@Rdf::RDF-TYPES),
+      Str :$language
     ) {
 
-      if $lexical-form ~~ m/ '@' \w+ $ / and $datatype ne $Rdf::LANGSTRING {
+say "$lexical-form, $datatype";
+      # If lixical form is a complete description then the datatype and
+      # language are ignored
+      #
+      if $lexical-form ~~ m/ '^^' / {
+        ( my $lform, my $datatype ) = $lexical-form.split(/'^^'/);
+        if $lform ~~ m/ '@\w+' $ / {
+          ( $lform, my $lang) = split(/'@'/);
+          $!language = $lang.lc;
+          if $datatype !~~ m/ 'langString' / {
+            die "Datatype wrong for language tagged strings";
+          }
+        }
+        
+        $!lexical-form = $lform;
+        $!datatype = full-iri($datatype);
+say "$!lexical-form, $!datatype, $datatype";
+      }
+
+      # If language is given the datatype is langString and the data is text.
+      # argument datatype is ignored.
+      #
+      elsif ?$language {
+        $!language = $language.lc;
+        $!lexical-form = $lexical-form;
+        $!datatype = full-iri('rdf:langString');
+      }
+
+      # if a language is tagged onto the text then the datatype must be
+      # langString if given.
+      #
+      elsif $lexical-form ~~ m/ '@' \w+ $ /
+            and ?$datatype
+            and $datatype ne 'rdf:langString' {
         die "Language string does not have proper datatype";
       }
 
-      if $lexical-form ~~ m/ '@' (\w+) $ / {
-        $!lang-tag = $/[0];
+      elsif $lexical-form ~~ m/ '@' (\w+) $ / {
+        $!language = $/[0];
       }
 
       $!lexical-form = $lexical-form;
-      $!datatype = full-iri($datatype);
+      $!datatype = ?$datatype ?? full-iri($datatype) !! 'xsd:string';
+#say "DT: $!datatype";
 
       my Str $value = $!lexical-form;   #   qq@"$!lexical-form"@;
-      if $!lang-tag.defined {
-        $value ~= "\@$!lang-tag^^" ~ $datatype;
+      if $!language.defined {
+        $value ~= "\@$!language^^" ~ $datatype;
       }
 
       elsif $!datatype !~~ 'xsd:string' {
@@ -51,14 +86,15 @@ package Rdf {
     #---------------------------------------------------------------------------
     # Implicit datatype(xsd:string) or specified in full datatype IRI
     #
-    multi submethod BUILD ( Str :$lexical-form, Str :$lang-tag ) {
+    multi submethod yBUILD ( Str :$lexical-form, Str :$lang-tag ) {
 
+say "$lexical-form, $lang-tag";
       # Normalize to lowercase
       #
       if ?$lang-tag {
-        $!lang-tag = $lang-tag.lc;
+        $!language = $lang-tag.lc;
         $!lexical-form = $lexical-form;
-        $!datatype = full-iri($Rdf::LANGSTRING);
+        $!datatype = full-iri('rdf:langString');
       }
 
       # Check if this is a full specification of a literal
@@ -66,15 +102,16 @@ package Rdf {
       elsif $lexical-form ~~ m/ '^^' / {
         ( my $lform, my $datatype ) = $lexical-form.split(/'^^'/);
         if $lform ~~ m/ '@\w+' $ / {
-          ( $lform, my $ltag) = split(/'@'/);
-          $!lang-tag = $ltag.lc;
-          if $datatype !~~ m/ 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString' / {
+          ( $lform, my $lang) = split(/'@'/);
+          $!language = $lang.lc;
+          if $datatype !~~ m/ 'langString' / {
             die "Datatype wrong for language tagged strings";
           }
         }
         
         $!lexical-form = $lform;
         $!datatype = full-iri($datatype);
+say "$!lexical-form, $!datatype, $datatype";
       }
 
       else {
@@ -85,8 +122,8 @@ package Rdf {
       # Strins and language tagged string don't need datatypes
       #
       my Str $value = $!lexical-form;
-      if $!lang-tag.defined {
-        $value ~= "\@$!lang-tag";
+      if $!language.defined {
+        $value ~= "\@$!language";
       }
 
       elsif $!datatype !~~ 'xsd:string' {
@@ -101,7 +138,7 @@ package Rdf {
     #---------------------------------------------------------------------------
     # Implicit datatype(xsd:string) or datatype('rdf:langString')
     #
-    multi submethod BUILD ( Str :$lexical-form, Str :$lang-tag is copy ) {
+    multi submethod xBUILD ( Str :$lexical-form, Str :$lang-tag is copy ) {
 
       my $dt;
       
@@ -113,11 +150,11 @@ package Rdf {
 
       $!lexical-form = $lexical-form;
       $!datatype = $dt;
-      $!lang-tag = $lang-tag if $lang-tag.defined;
+      $!language = $lang-tag if $lang-tag.defined;
 
       my Str $value = $!lexical-form;
-      if $!lang-tag.defined {
-        $value ~= "\@$!lang-tag";
+      if $!language.defined {
+        $value ~= "\@$!language";
       }
 
       elsif $!datatype !~~ 'xsd:string' {
@@ -157,7 +194,7 @@ package Rdf {
     #---------------------------------------------------------------------------
     #
     method get-lang-tag ( ) {
-      return $!lang-tag;
+      return $!language;
     }
   }
 }

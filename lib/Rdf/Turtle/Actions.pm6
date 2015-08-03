@@ -10,7 +10,8 @@ package Rdf {
     has Str $.base = 'file:///' ~ $*PROGRAM-NAME ~ '#';
 
     has Str $.prefix-name;
-    has Str $.url;
+    has Str $.relative-uri;
+
     has Str $.iri;
     has Str $.blank;
     has Str $.literal;
@@ -29,82 +30,50 @@ say "prefix-name: ", ~$match;
 
     #---------------------------------------------------------------------------
     #
-    method resource ( $match ) {
-#      $!iri = ~$match;
-
-say "resource $match";
-    }
-
-    #---------------------------------------------------------------------------
-    #
-    method uri-ref ( $match ) {
-#      $!iri = ~$match;
-
-say "uri-ref $match";
-    }
-
-    #---------------------------------------------------------------------------
-    #
     method relative-uri ( $match ) {
 #      $!iri = ~$match;
 
 say "relative-uri $match";
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    method prefix-id ( $match ) {
+      
+      # When no prefix text is given, set it as a default
+      #
+say ? $!prefix-name
+    ?? "Set prefix for $!prefix-name"
+    !! "Set default prefix";
+
+      if ?$!prefix-name {
+        prefix( :prefix($!prefix-name), :local-name($!relative-uri));
+      }
+
+      else {
+        prefix(:local-name($!relative-uri));
+      }
+      
+      # Reset prefix to type object to recognize any default settings
+      #
+      $!prefix-name = Str;
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    method base-id ( $match ) {
+      # Check if absolute url. if not, append to base
+      #
+      $!base = $!relative-uri ~~ m/ ^ \w+ '://' /
+               ?? $!relative-uri
+               !! $!base ~ $!relative-uri;
+say "Set base for productions to $!base";
     }
   }
 }
 
 
 =finish
-    #---------------------------------------------------------------------------
-    #
-    method turtle-base ( $match ) {
-      # Check if absolute url. if not, append to base
-      #
-      $!base = $!url ~~ m/ ^ \w+ '://' /
-               ?? $!url
-               !! $!base ~ $!url;
-say "Set base for productions to $!base";
-    }
-
-    #---------------------------------------------------------------------------
-    #
-    method turtle-prefix ( $match ) {
-      
-      # When no prefix text is given, set it as a default
-      #
-say ?$!prefix
-    ?? "Set prefix for $!prefix"
-    !! "Set default prefix";
-
-      if ?$!prefix {
-        prefix( :prefix($!prefix), :local-name($!url));
-      }
-      
-      else {
-        prefix(:local-name($!url));
-      }
-      
-      # Reset prefix to type object to recognize any default settings
-      #
-      $!prefix = Str;
-    }
-
-    #---------------------------------------------------------------------------
-    #
-    method prefix-id ( $match ) {
-
-#say "Set prefix id: ", $match.perl;
-      $!prefix = ~$match;
-    }
-
-    #---------------------------------------------------------------------------
-    #
-    method relative-uri ( $match ) {
-
-      $!url = ~$match;
-say "Set url: $!url";
-    }
-
     #---------------------------------------------------------------------------
     # Subject can be an iri or a blank iri
     #
