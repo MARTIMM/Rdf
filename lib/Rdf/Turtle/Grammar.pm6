@@ -6,9 +6,9 @@ package Rdf {
 
   our $seen-eol = False;
 
-  our $parse-subject;
-  our $parse-predicate;
-  our $parse-object;
+  our $parse-subject-item;
+  our $parse-predicate-item;
+  our $parse-object-item;
 
   #-----------------------------------------------------------------------------
   #
@@ -24,28 +24,27 @@ package Rdf {
       )
     }
 
-    rule directive { <prefix-id> | <base> }
+    rule directive { <prefix-id> | <base-id> }
 
     # '@prefix' prefix-name ':' url .
     # '@prefix' ':' url .
     #
     rule prefix-id {
-      '@prefix' { $Rdf::seen-eol = False; say "prefix $/"; }
-      <white-space>* <prefix-name>? {say "prefix-name $/";}
-      ':' <uri-ref> {say "Uri ref $0";}
+      '@prefix' { $Rdf::seen-eol = False; }
+      <white-space>* <prefix-name>? ':' <uri-ref>
     }
 
     # '@base' url .
     #
-    rule base {
-      '@base' { $Rdf::seen-eol = False }
+    rule base-id {
+      '@base' { $Rdf::seen-eol = False; }
       <white-space>* <uri-ref>
     }
 
-    # subject predicate object .
+    # subject-item predicate object .
     #
     rule triples {
-      <subject> { $Rdf::seen-eol = $parse-subject = False; }
+      <subject-item> { $Rdf::seen-eol = $parse-subject-item = False; }
       <predicateObjectList>
     }
 
@@ -55,10 +54,10 @@ package Rdf {
     }
 
     rule objectList {
-      <object> ( ',' <object> )* { $parse-object = False; }
+      <object-item> ( ',' <object-item> )* { $parse-object-item = False; }
     }
 
-    rule verb { ( <predicate> | 'a' ) { $parse-predicate = False; } }
+    rule verb { ( <predicate-item> | 'a' ) { $parse-predicate-item = False; } }
 
     # White space detection is more simple because the perl6 grammar system
     # skips this automatically in rules. \n will take care of all kinds of
@@ -68,9 +67,18 @@ package Rdf {
     rule white-space { <comment> }
     rule comment { '#' <-[\n]>* }
 
-    rule subject { { $parse-subject = True; } ( <resource> | <blank> ) }
-    rule predicate { { $parse-predicate = True; } <resource> }
-    rule object { { $parse-object = True; } ( <resource> | <blank> | <literal> ) }
+    rule subject-item {
+      { $parse-subject-item = True; }
+      ( <resource> | <blank-node> )
+    }
+    rule predicate-item {
+      { $parse-predicate-item = True; }
+      <resource>
+    }
+    rule object-item {
+      { $parse-object-item = True; }
+      ( <resource> | <blank-node> | <literal> )
+    }
 
     # '"' text '"'
     # '"""' long piece of text '"""'
@@ -104,14 +112,16 @@ package Rdf {
 
     # '_:' local-name
     #
-    rule blank {
+    rule blank-node {
         <node-id>
       | '[]'
       | '[' <predicateObjectList> ']'
       | <collection>
     }
 
-    rule item-list { <object>+ }
+    rule node-id { '_:' <name> }
+
+    rule item-list { <object-item>+ }
     rule collection { '(' <item-list>? ')' }
 
     # '<' url '>'
@@ -120,16 +130,14 @@ package Rdf {
     # ':'
     #
     rule resource { ( <uri-ref> | <qname> ) }
-
-    rule node-id { '_:' <name> }
-    rule qname { <prefix-name>? ':' <name>? }
     rule uri-ref { '<' ~ '>' <relative-uri> }
+    rule qname { <prefix-name>? ':' <name>? }
+    token relative-uri { <u-character>* }
 
     rule language { <[a..z]>+ ( '-' <[a..z0..9]>+ )* }
 
     token name-start-char {
-        <[a..z]>
-      | <[A..Z]>
+        <[a..zA..Z]>
       | <[\x00c0..\x00d6]> | <[\x00d8..\x00f6]>
       | <[\x00f8..\x02ff]> | <[\x0370..\x037d]>
       | <[\x037f..\x1fff]> | <[\x200c..\x200d]>
@@ -147,7 +155,6 @@ package Rdf {
     rule name { (<name-start-char> | '_' ) <name-char>* }
     token prefix-name { <name-start-char> <name-char>* }
 
-    token relative-uri { <u-character>* }
     rule quoted-string { <string> | <long-string> }
     token string { '"' ~ '"' <s-character> }
     token long-string { '"""' ~ '"""' <l-character> }

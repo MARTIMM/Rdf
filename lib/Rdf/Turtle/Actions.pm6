@@ -9,7 +9,7 @@ package Rdf {
 
     has Str $.base = 'file:///' ~ $*PROGRAM-NAME ~ '#';
 
-    has Str $.prefix;
+    has Str $.prefix-name;
     has Str $.url;
     has Str $.iri;
     has Str $.blank;
@@ -19,7 +19,42 @@ package Rdf {
     has Str $.predicate;
     has Str $.object;
 
+    #---------------------------------------------------------------------------
+    #
+    method prefix-name ( $match ) {
 
+say "prefix-name: ", ~$match;
+      $!prefix-name = ~$match;
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    method resource ( $match ) {
+#      $!iri = ~$match;
+
+say "resource $match";
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    method uri-ref ( $match ) {
+#      $!iri = ~$match;
+
+say "uri-ref $match";
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    method relative-uri ( $match ) {
+#      $!iri = ~$match;
+
+say "relative-uri $match";
+    }
+  }
+}
+
+
+=finish
     #---------------------------------------------------------------------------
     #
     method turtle-base ( $match ) {
@@ -156,5 +191,3 @@ say "Resource $match";
       $!literal = ~$match;
 say "Literal ", ~$match;
     }
-  }
-}

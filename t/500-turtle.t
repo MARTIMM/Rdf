@@ -3,9 +3,22 @@ use Test;
 
 use Rdf;
 use Rdf::Turtle;
+use Rdf::Turtle::Grammar;
 
 my Rdf::Turtle $t .= new;
 
+
+#-------------------------------------------------------------------------------
+subtest {
+
+  my Rdf::Turtle::Grammar $grammar .= new;
+  my $status = $grammar.parse( "\n");
+  is ?$status, True, "Raw parse empty text ok";
+
+  $status = $grammar.parse( "# comment", :rule('comment'));
+  is ?$status, True, "Raw parse comment ok";
+
+}, 'raw access';
 
 #-------------------------------------------------------------------------------
 subtest {
