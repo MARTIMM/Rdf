@@ -1,6 +1,5 @@
 package Rdf:ver<0.1.0>:auth<https://github.com/MARTIMM> {
 
-if 0 {
   #-----------------------------------------------------------------------------
   # Definition of used constants
   # Node types
@@ -10,6 +9,7 @@ if 0 {
   constant $NODE-LITERAL        = 0x0003;
   constant $NODE-GRAPH          = 0x0004;
 
+if 0 {
   #-----------------------------------------------------------------------------
   # XSD (http://www.w3.org/2000/01/rdf-schema#) Data types recognized
   # by the program. See table 'A list of the RDF-compatible XSD types, with

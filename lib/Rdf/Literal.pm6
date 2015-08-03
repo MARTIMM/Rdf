@@ -18,13 +18,12 @@ package Rdf {
     # When $lexical-form is "some string"@lang-tag $datatype must be
     # rdf:langString.
     #
-    submethod BUILD (
+    multi submethod BUILD (
       Str :$lexical-form,
       Str :$datatype, # where $datatype ~~ any(@Rdf::RDF-TYPES),
       Str :$language
     ) {
 
-say "$lexical-form, $datatype";
       # If lixical form is a complete description then the datatype and
       # language are ignored
       #
@@ -40,7 +39,6 @@ say "$lexical-form, $datatype";
         
         $!lexical-form = $lform;
         $!datatype = full-iri($datatype);
-say "$!lexical-form, $!datatype, $datatype";
       }
 
       # If language is given the datatype is langString and the data is text.
@@ -63,15 +61,22 @@ say "$!lexical-form, $!datatype, $datatype";
 
       elsif $lexical-form ~~ m/ '@' (\w+) $ / {
         $!language = $/[0];
+        $lexical-form ~~ s/ '@' (\w+) $ //;
       }
-
-      $!lexical-form = $lexical-form;
-      $!datatype = ?$datatype ?? full-iri($datatype) !! 'xsd:string';
-#say "DT: $!datatype";
+      
+      elsif ?$datatype {
+        $!lexical-form = $lexical-form;
+        $!datatype = full-iri($datatype);
+      }
+      
+      else {
+        $!lexical-form = $lexical-form;
+        $!datatype = full-iri('xsd:string');
+      }
 
       my Str $value = $!lexical-form;   #   qq@"$!lexical-form"@;
       if $!language.defined {
-        $value ~= "\@$!language^^" ~ $datatype;
+        $value ~= "\@$!language";
       }
 
       elsif $!datatype !~~ 'xsd:string' {
@@ -82,6 +87,42 @@ say "$!lexical-form, $!datatype, $datatype";
       self.set-short-value(short-iri($value));
       self.set-type($Rdf::NODE-LITERAL);
     }
+
+    #---------------------------------------------------------------------------
+    # Shortcuts
+    # new( :$lexical-form, :datatype('xsd:integer'))
+    #
+    multi submethod BUILD ( Int :$lexical-form ) {
+      $!lexical-form = $lexical-form.fmt('%s');
+      $!datatype = full-iri('xsd:integer');
+
+      self.set-value($!lexical-form ~ '^^' ~ $!datatype);
+      self.set-short-value(short-iri($!lexical-form ~ '^^' ~ $!datatype));
+      self.set-type($Rdf::NODE-LITERAL);
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    method get-form ( ) {
+      return $!lexical-form;
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    method get-datatype ( ) {
+      return $!datatype;
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    method get-lang-tag ( ) {
+      return $!language;
+    }
+  }
+}
+
+
+=finish
 
     #---------------------------------------------------------------------------
     # Implicit datatype(xsd:string) or specified in full datatype IRI
@@ -165,40 +206,4 @@ say "$!lexical-form, $!datatype, $datatype";
       self.set-short-value(short-iri($value));
       self.set-type($Rdf::NODE-LITERAL);
     }
-
-    #---------------------------------------------------------------------------
-    # Shortcuts
-    # new( :$lexical-form, :datatype('xsd:integer'))
-    #
-    multi submethod BUILD ( Int :$lexical-form ) {
-      $!lexical-form = $lexical-form.fmt('%s');
-      $!datatype = full-iri('xsd:integer');
-
-      self.set-value($!lexical-form ~ '^^' ~ $!datatype);
-      self.set-short-value(short-iri($!lexical-form ~ '^^' ~ $!datatype));
-      self.set-type($Rdf::NODE-LITERAL);
-    }
-
-    #---------------------------------------------------------------------------
-    #
-    method get-form ( ) {
-      return $!lexical-form;
-    }
-
-    #---------------------------------------------------------------------------
-    #
-    method get-datatype ( ) {
-      return $!datatype;
-    }
-
-    #---------------------------------------------------------------------------
-    #
-    method get-lang-tag ( ) {
-      return $!language;
-    }
-  }
-}
-
-
-=finish
 
