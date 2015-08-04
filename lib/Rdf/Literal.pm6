@@ -36,7 +36,7 @@ package Rdf {
             die "Datatype wrong for language tagged strings";
           }
         }
-        
+
         $!lexical-form = $lform;
         $!datatype = full-iri($datatype);
       }

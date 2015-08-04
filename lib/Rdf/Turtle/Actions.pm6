@@ -31,9 +31,9 @@ say "prefix-name: ", ~$match;
     #---------------------------------------------------------------------------
     #
     method relative-uri ( $match ) {
-#      $!iri = ~$match;
+      $!relative-uri = ~$match;
 
-say "relative-uri $match";
+say "relative-uri $!relative-uri";
     }
 
     #---------------------------------------------------------------------------
