@@ -1,4 +1,18 @@
+use v6;
+use File::HomeDir;
+use HTTP::Client;
+
 package Rdf:ver<0.1.0>:auth<https://github.com/MARTIMM> {
+
+  my $home-dir = File::HomeDir.my_home;
+  my $pname = "$home-dir/." ~ $*PROGRAM-NAME;
+  $pname ~~ s/\.          # Start with the dot
+              <-[.]>+     # Then no dot may appear after that
+              $           # til the end
+             //;          # Remove found extention
+
+  mkdir( $pname, :8<755>) unless $pname.IO ~~ :d;
+  our $home-dir-path = "$pname/";
 
   #-----------------------------------------------------------------------------
   # Definition of used constants
@@ -214,8 +228,6 @@ if 0 {
 #    $prefixes{' '} = 'file:///' ~ $*PROGRAM-NAME ~ '#';
   }
 
-  # Cache data into local files
-  #
 
 
   module Rdf-Tools {
@@ -228,11 +240,44 @@ if 0 {
     ) is export {
 
       if ?$prefixes{$prefix} {
-        note "Prefix '$prefix' in use for $prefixes{$prefix}";
+        note "Prefix '$prefix' in use and mapped to $prefixes{$prefix}";
       }
 
       else {
         $prefixes{$prefix} = $local-name;
+
+say "local name: $local-name";
+        # Check protocol
+        #
+        if $local-name ~~ m/ ^ 'http://' / {
+          # device local name from url
+          #
+          my $cache-name = $local-name;
+          $cache-name ~~ s/ ^ 'http://' //;
+          $cache-name ~~ s:g/ \/ /-/;
+
+          # Check if there is a local version cached in the home directory
+          #
+          if $cache-name.IO !~~ :r {
+            # Cache data into local files
+            #
+            my HTTP::Client $client .= new;
+            my $response = $client.get($local-name);
+            if $response.success {
+              my $content = $response.content;
+  #            my $mt = open( 'mime-types-list.html', :rw, :!bin);
+  #            $mt.print($content);
+  #            $mt.close;
+              spurt( $home-dir-path ~ $cache-name, $content);
+            }
+
+            else {
+              note "$local-name is not downloadable";
+            }
+          }
+          
+          # Parse the turtle file to get all defined triples
+        }
       }
     }
 
