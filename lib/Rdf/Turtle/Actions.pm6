@@ -3,11 +3,11 @@ use Rdf;
 
 package Rdf {
 
+  our $base;
+
   #-----------------------------------------------------------------------------
   #
   class Turtle::Actions {
-
-    has Str $.base = 'file:///' ~ $*PROGRAM-NAME ~ '#';
 
     has Str $.prefix-name;
     has Str $.relative-uri;
@@ -20,12 +20,24 @@ package Rdf {
     has Str $.predicate;
     has Str $.object;
 
+
+    #---------------------------------------------------------------------------
+    #
+    submethod BUILD (  ) {
+      if !$Rdf::base.defined {
+        $Rdf::base = 'file:///' ~ $*PROGRAM-NAME;
+        $Rdf::base ~~ s/ '.' <-[.]>+ $ //;
+        $Rdf::base ~= '#';
+say "Base at start: $base";
+      }
+    }
+
     #---------------------------------------------------------------------------
     #
     method prefix-name ( $match ) {
 
-say "prefix-name: ", ~$match;
       $!prefix-name = ~$match;
+say "prefix-name: $!prefix-name";
     }
 
     #---------------------------------------------------------------------------
@@ -33,7 +45,13 @@ say "prefix-name: ", ~$match;
     method relative-uri ( $match ) {
       $!relative-uri = ~$match;
 
-say "relative-uri $!relative-uri";
+      # When uri is without protocol part than prepend the base upon it
+      #
+      if $!relative-uri !~~ m/ ^ \w+ '://' / {
+        $!relative-uri = $Rdf::base ~ $!relative-uri;
+      }
+
+say "relative-uri: $!relative-uri";
     }
 
     #---------------------------------------------------------------------------
@@ -46,6 +64,8 @@ say ? $!prefix-name
     ?? "Set prefix for $!prefix-name"
     !! "Set default prefix";
 
+      # Check if prefix name is defined. If not then its a default prefix
+      #
       if ?$!prefix-name {
         prefix( :prefix($!prefix-name), :local-name($!relative-uri));
       }
@@ -64,10 +84,10 @@ say ? $!prefix-name
     method base-id ( $match ) {
       # Check if absolute url. if not, append to base
       #
-      $!base = $!relative-uri ~~ m/ ^ \w+ '://' /
+      $Rdf::base = $!relative-uri ~~ m/ ^ \w+ '://' /
                ?? $!relative-uri
-               !! $!base ~ $!relative-uri;
-say "Set base for productions to $!base";
+               !! $Rdf::base ~ $!relative-uri;
+say "Set base for productions to $Rdf::base";
     }
   }
 }
@@ -80,7 +100,7 @@ say "Set base for productions to $!base";
     method subject ( $match ) {
       my Str $s;
       if ~$match ~~ m/ ^ '<' / {
-        $s = $!base ~ $!url;
+        $s = $Rdf::base ~ $!url;
       }
       
       elsif ~$match ~~ m/ ^ ':' / {
@@ -103,7 +123,7 @@ say "Subject ", full-iri($!subject);
     method predicate ( $match ) {
       my Str $p;
       if ~$match ~~ m/ ^ '<' / {
-        $p = $!base ~ $!url;
+        $p = $Rdf::base ~ $!url;
       }
       
       elsif ~$match ~~ m/ ^ ':' / {
@@ -124,7 +144,7 @@ say "Predicate ", full-iri($!predicate);
     method object ( $match ) {
       my Str $o;
       if ~$match ~~ m/ ^ '<' / {
-        $o = $!base ~ $!url;
+        $o = $Rdf::base ~ $!url;
       }
       
       elsif ~$match ~~ m/ ^ ':' / {
