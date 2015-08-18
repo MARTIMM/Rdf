@@ -15,15 +15,16 @@ That last thing would prove to be difficult, but we'll see.
 
   * Rdf.pm6
 
-    Package with variables and a module with some exported subs
+  Package with variables and a module with some exported subs
 
-    [x] Pre defined prefixes
-    [ ] Caching of network data
-    Module
-    [x] prefix()
-    [x] get-prefix()
-    [x] short-iri()
-    [x] full-iri()
+  * [x] Pre defined prefixes
+  * [ ] Caching of network data 
+  
+  Module
+  * [x] prefix()
+  * [x] get-prefix()
+  * [x] short-iri()
+  * [x] full-iri()
 
   * Rdf/Blank.pm6
   * Rdf/Graph.pm6
@@ -46,13 +47,13 @@ That last thing would prove to be difficult, but we'll see.
 
 * Turtle
 
-  [x] empty turtle document
-  [x] comment on top level
-  [x] @base
-  [x] @prefix
-  [x] 3-tuple or subject predicate and objects
+  * [x] empty turtle document
+  * [x] comment on top level
+  * [x] @base
+  * [x] @prefix
+  * [x] 3-tuple or subject predicate and objects
 
-* Connecting to Nepomuk and Tracker
+* Connecting to Virtuoso, Nepomuk and Tracker
 
 ## Changes
 
