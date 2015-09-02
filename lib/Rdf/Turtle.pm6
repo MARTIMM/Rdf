@@ -2,7 +2,7 @@
 # http://www.w3.org/TeamSubmission/turtle/#relativeURI
 #
 use v6;
-use Rdf;
+use Rdf;                        # Load first!
 use Rdf::Turtle::Grammar;
 use Rdf::Turtle::Actions;
 
@@ -17,7 +17,7 @@ package Rdf {
 
     #---------------------------------------------------------------------------
     #
-    method parse-file ( str :$filename where $filename.IO ~~ :r ) {
+    method parse-file ( str :$filename where $filename.IO ~~ :r --> Match) {
 
       $!actions = Rdf::Turtle::Actions.new(:init);
       my $text = slurp($filename);
@@ -26,21 +26,13 @@ package Rdf {
 
     #-----------------------------------------------------------------------------
     #
-    method parse ( :$content is copy ) {
-
-      # Remove comments, trailing and leading spaces
-      #
-  #    $content ~~ s:g/<-[\\]>\#.*?$$//;
-  #    $content ~~ s/^\#.*?$$\n//;
-  #say "\nContent;\n$content\n\n";
-      $content ~~ s/^\s+//;
-      $content ~~ s/\s+$//;
+    method parse ( :$content is copy --> Match ) {
 
       # Parse the content. Parse can be recursively called
       #
       $!grammar .= new;
       $!actions .= new;
-      return $!grammar.parse( $content, :actions($!actions));
+      return $!grammar.parse( $content, :actions($!actions)) // Match.new;
     }
   }
 }

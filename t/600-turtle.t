@@ -7,8 +7,12 @@ use Rdf::Turtle;
 my Rdf::Turtle $t .= new;
 
 #-------------------------------------------------------------------------------
-my $status = $t.parse-file(:filename('lib/Rdf/Turtle/Turtle Code/22-rdf-syntax-ns'));
-is ?$status, True, "Parse 22-rdf-syntax-ns ok";
+my Match $status = $t.parse-file(
+  :filename('lib/Rdf/Turtle/Turtle Code/22-rdf-syntax-ns')
+);
+
+ok $status.chunks.elems > 0,
+   "Parse 22-rdf-syntax-ns matched elements {$status.list.elems}";
 
 #-------------------------------------------------------------------------------
 # Cleanup

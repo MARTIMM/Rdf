@@ -4,6 +4,8 @@ use HTTP::Client;
 
 package Rdf:ver<0.1.0>:auth<https://github.com/MARTIMM> {
 
+  # Setup the home directory for this program
+  #
   my $home-dir = File::HomeDir.my_home;
   my $pname = "$home-dir/." ~ $*PROGRAM-NAME;
   $pname ~~ s/\.          # Start with the dot
@@ -13,6 +15,20 @@ package Rdf:ver<0.1.0>:auth<https://github.com/MARTIMM> {
 
   mkdir( $pname, :8<755>) unless $pname.IO ~~ :d;
   our $home-dir-path = "$pname/";
+  
+  # Setup the base url for this application. Can be modified later.
+  #
+  our $base;
+  if !$base.defined {
+    $base = 'file:///' ~ $*PROGRAM-NAME;
+    $base ~~ s/ '.' <-[.]>+ $ //;
+    $base ~= '#';
+say "Base at start: $base";
+  }
+  
+  else {
+say "Base defined as: $base";
+  }
 
   #-----------------------------------------------------------------------------
   # Definition of used constants
@@ -239,14 +255,15 @@ if 0 {
       Str :$local-name where $local-name.chars >= 1
     ) is export {
 
+say "local name: '$prefix', '$local-name'";
       if ?$prefixes{$prefix} {
-        note "Prefix '$prefix' in use and mapped to $prefixes{$prefix}";
+        note "Prefix '$prefix' in use and mapped to $prefixes{$prefix}"
+          unless $prefixes{$prefix} eq $local-name;
       }
 
       else {
         $prefixes{$prefix} = $local-name;
 
-say "local name: $local-name";
         # Check protocol
         #
         if $local-name ~~ m/ ^ 'http://' / {
@@ -283,8 +300,26 @@ say "local name: $local-name";
 
     #---------------------------------------------------------------------------
     #
-    sub get-prefix ( Str $prefix = ' ' ) is export {
-      return $prefixes{$prefix};
+    sub get-prefix ( Str $prefix = ' ' --> Str ) is export {
+      return $prefixes{$prefix} // '';
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    sub get-homedir (  --> Str ) is export {
+      return $home-dir;
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    sub get-base (  --> Str ) is export {
+      return $base;
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    sub set-base ( Str $new-base --> Str ) is export {
+      $base = $new-base;
     }
 
     #---------------------------------------------------------------------------

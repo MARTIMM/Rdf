@@ -69,7 +69,7 @@ package Rdf {
 
     rule subject-item {
       { $parse-subject-item = True; }
-      ( <resource> | <blank-node> )
+      ( <resource> {say "SI R: $/"} | <blank-node> {say "SI BN: $/"} )
     }
     rule predicate-item {
       { $parse-predicate-item = True; }
@@ -89,7 +89,7 @@ package Rdf {
     # number '.' number '^^' data-type-iri
     # '"' text '"' '^^' data-type-iri
     #
-    rule token {
+    token literal {
         <quoted-string> ( '@' <language> )?
       | <datatype-string>
       | integer
@@ -132,12 +132,11 @@ package Rdf {
     token resource { ( <uri-ref> | <qname> ) }
     token uri-ref { '<' ~ '>' <relative-uri> }
     rule qname { <prefix-name>? ':' <name>? }
-    token relative-uri { <u-character>* }
 
     token language { <[a..z]>+ ( '-' <[a..z0..9]>+ )* }
 
-    token name-start-char {
-        <[a..zA..Z]>
+    token name_start_char {
+        <[a..z A..Z _]>
       | <[\x00c0..\x00d6]> | <[\x00d8..\x00f6]>
       | <[\x00f8..\x02ff]> | <[\x0370..\x037d]>
       | <[\x037f..\x1fff]> | <[\x200c..\x200d]>
@@ -147,34 +146,32 @@ package Rdf {
     }
 
     token name-char {
-        <name-start-char> | <[0..9\-\_]>
+        <name_start_char> | <[0..9 -]>
       | "\x00B7" | <[\x0300..\x036F]>
       | <[\x203F..\x2040]>
     }
 
-    token name { (<name-start-char> | '_' ) <name-char>* }
-    token prefix-name { <name-start-char> <name-char>* }
-
+    token name { <name_start_char> <name-char>* }
+    token prefix-name { <+ name_start_char - [_]> <name-char>* }
+    token relative-uri { <u-character>* }
     rule quoted-string { <string> | <long-string> }
-    token string { '"' ~ '"' <s-character> }
-    token long-string { '"""' ~ '"""' <l-character> }
+    token string { '"' ~ '"' <s-character>* }
+    token long-string { '"""' ~ '"""' <l-character>* }
 
     token character {
         '\u' <hex>**4
       | '\U ' <hex>*8
       | '\\'
-      | "\x20" | "\x21"                 # \x22 (") not for s-character
-      | <[\x23..\x3d]>
-      | <[\x3f..\x5b]>                  # \x3e (>) not for u-character
+      | <[\x20..\x5b]>
       | <[\x5d..\x10ffff]>
     }
 
-    token e-character { <character> | <[\"\>\t\n]> }
-    token u-character { <character> | '"' | '\>' }     # '>' must be escaped
-    token s-character { <character> | '>' | '\"' }     # '"' must be escaped
-    token l-character { <echaracter> | '\"' }
+    token e-character { <character> | <[\t\n\r]> }
+    token u-character { <+ character - [\x3e]> | '\>' {say "UChar: $/";} }
+    token s-character { <+ e-character - [\x22]> | '\"' }
+    token l-character { <e-character> | '\"' | \x9 | \xa | \xd }
 
-    token hex { <[0..9a..fA..F]> }
+    token hex { <[0..9 a..f A..F]> }
   }
 }
 

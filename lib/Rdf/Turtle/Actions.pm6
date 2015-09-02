@@ -3,8 +3,6 @@ use Rdf;
 
 package Rdf {
 
-  our $base;
-
   #-----------------------------------------------------------------------------
   #
   class Turtle::Actions {
@@ -20,16 +18,10 @@ package Rdf {
     has Str $.predicate;
     has Str $.object;
 
-
     #---------------------------------------------------------------------------
     #
     submethod BUILD (  ) {
-      if !$Rdf::base.defined {
-        $Rdf::base = 'file:///' ~ $*PROGRAM-NAME;
-        $Rdf::base ~~ s/ '.' <-[.]>+ $ //;
-        $Rdf::base ~= '#';
-say "Base at start: $base";
-      }
+#say "\nAt 2: $Rdf::base";
     }
 
     #---------------------------------------------------------------------------
@@ -37,7 +29,7 @@ say "Base at start: $base";
     method prefix-name ( $match ) {
 
       $!prefix-name = ~$match;
-say "prefix-name: $!prefix-name";
+say "\nprefix-name: $!prefix-name";
     }
 
     #---------------------------------------------------------------------------
@@ -48,7 +40,7 @@ say "prefix-name: $!prefix-name";
       # When uri is without protocol part than prepend the base upon it
       #
       if $!relative-uri !~~ m/ ^ \w+ '://' / {
-        $!relative-uri = $Rdf::base ~ $!relative-uri;
+        $!relative-uri = get-base() ~ $!relative-uri;
       }
 
 say "relative-uri: $!relative-uri";
@@ -84,9 +76,11 @@ say ? $!prefix-name
     method base-id ( $match ) {
       # Check if absolute url. if not, append to base
       #
-      $Rdf::base = $!relative-uri ~~ m/ ^ \w+ '://' /
-               ?? $!relative-uri
-               !! $Rdf::base ~ $!relative-uri;
+      set-base(
+        $!relative-uri ~~ m/ ^ \w+ '://' /
+          ?? $!relative-uri
+          !! get-base() ~ $!relative-uri
+      );
 say "Set base for productions to $Rdf::base";
     }
   }
@@ -100,7 +94,7 @@ say "Set base for productions to $Rdf::base";
     method subject ( $match ) {
       my Str $s;
       if ~$match ~~ m/ ^ '<' / {
-        $s = $Rdf::base ~ $!url;
+        $s = get-base() ~ $!url;
       }
       
       elsif ~$match ~~ m/ ^ ':' / {
@@ -123,7 +117,7 @@ say "Subject ", full-iri($!subject);
     method predicate ( $match ) {
       my Str $p;
       if ~$match ~~ m/ ^ '<' / {
-        $p = $Rdf::base ~ $!url;
+        $p = get-base() ~ $!url;
       }
       
       elsif ~$match ~~ m/ ^ ':' / {
@@ -144,7 +138,7 @@ say "Predicate ", full-iri($!predicate);
     method object ( $match ) {
       my Str $o;
       if ~$match ~~ m/ ^ '<' / {
-        $o = $Rdf::base ~ $!url;
+        $o = get-base() ~ $!url;
       }
       
       elsif ~$match ~~ m/ ^ ':' / {
