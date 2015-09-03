@@ -24,7 +24,7 @@ package Rdf {
       Str :$language
     ) {
 
-      # If lixical form is a complete description then the datatype and
+      # If lexical form is a complete description then the datatype and
       # language are ignored
       #
       if $lexical-form ~~ m/ '^^' / {
