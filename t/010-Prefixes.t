@@ -10,7 +10,7 @@ subtest {
      'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
      'rdf prefix';
 
-  prefix(local-name => 'file://Perl6/Projects/Rdf#');
+  set-prefix(local-name => 'file://Perl6/Projects/Rdf#');
   is get-prefix(), 'file://Perl6/Projects/Rdf#', 'default prefix';
 
 }, 'Prefixes';
@@ -29,7 +29,7 @@ subtest {
      Str,
      "'xyz:abc' not translated";
 
-  prefix(
+  set-prefix(
     prefix => 'xyz',
     local-name => 'file://Perl6/Projects/Rdf-xyz#'
   );

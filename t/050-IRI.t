@@ -32,7 +32,7 @@ subtest {
   my Rdf::Node $i2 = Rdf::Node-builder.create('abc');
   nok ?$i2, "Node i2 not defined";
 
-  prefix( local-name => 'file://Perl6/Projects/Rdf#' );
+  set-prefix( local-name => 'file://Perl6/Projects/Rdf#' );
   $i2 = Rdf::Node-builder.create('abc');
   is "$i2", 'file://Perl6/Projects/Rdf#abc', "IRI i2 = $i2";
 

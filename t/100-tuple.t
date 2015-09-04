@@ -4,7 +4,7 @@ use Test;
 use Rdf;
 use Rdf::Rdf-tuple;
 
-prefix(local-name => 'file://Perl6/Projects/Rdf#');
+set-prefix(local-name => 'file://Perl6/Projects/Rdf#');
 
 #-------------------------------------------------------------------------------
 subtest {
