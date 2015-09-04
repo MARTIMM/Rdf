@@ -3,7 +3,7 @@ use File::HomeDir;
 use HTTP::UserAgent;
 #use Rdf::Turtle;               # Circular loading Rdf!
 
-package Rdf:ver<0.1.0>:auth<https://github.com/MARTIMM> {
+package Rdf:ver<0.3.1>:auth<https://github.com/MARTIMM> {
 
   #-----------------------------------------------------------------------------
   # Definition of used constants

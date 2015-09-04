@@ -39,23 +39,50 @@ That last thing would prove to be difficult, but we'll see.
   * Rdf/Turtle/Grammar.pm6
 
 
+
 ## Possible extentions
+
+### Sources
 
 * XML
 * Semi-xml
 * JSON-LD
-
 * Turtle
+  [x] Grammar
+  [ ] Store
 
-  * [x] empty turtle document
-  * [x] comment on top level
-  * [x] @base
-  * [x] @prefix
-  * [x] 3-tuple or subject predicate and objects
+
+### Storage
+
+* MongoDB
+
+
+### Search
+
+* 
+
+
+### Other programs and environments
 
 * Connecting to Virtuoso, Nepomuk and Tracker
 
+
+
 ## Changes
+
+* 0.3.1
+  * Grammar modifications. Remove verb and brought rules into <predicate-item>
+
+* 0.3.0
+  * Turtle grammar installed. Works ok on turtle file from
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  * Problems are found xcaused by perl6. E.g. the line
+    ```token prefix-name { <+ name-start-char - [_]> <name-char>* }```
+    had to be rewritten because the id name-start-char was accidently recognized
+    as 3 subrules with substraction operators in between.
+
+* 0.2.0
+  * Caching of sources in prefix rules
 
 * 0.1.0 Start
 
