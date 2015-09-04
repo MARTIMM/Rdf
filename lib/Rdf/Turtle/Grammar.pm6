@@ -49,15 +49,17 @@ package Rdf {
     }
 
     rule predicateObjectList {
-      <verb> <objectList>
-      ( ';' <verb> <objectList> )* ( ';' )?
+#      <verb> <objectList>
+#      ( ';' <verb> <objectList> )* ( ';' )?
+      <predicate-item> <objectList>
+      ( ';' <predicate-item> <objectList> )* ( ';' )?
     }
 
     rule objectList {
       <object-item> ( ',' <object-item> )* { $parse-object-item = False; }
     }
 
-    rule verb { ( <predicate-item> | 'a' {say "Predicate: $/"} ) { $parse-predicate-item = False; } }
+#    rule verb { ( <predicate-item> | 'a' ) { $parse-predicate-item = False; } }
 
     # White space detection is more simple because the perl6 grammar system
     # skips this automatically in rules. \n will take care of all kinds of
@@ -69,18 +71,15 @@ package Rdf {
 
     rule subject-item {
       { $parse-subject-item = True; }
-      ( <resource> {say "Subject: $/"} | <blank-node> {say "Subject BN: $/"} )
+      ( <resource> | <blank-node> )
     }
     rule predicate-item {
       { $parse-predicate-item = True; }
-      <resource> {say "Predicate: $/"}
+      <resource> | 'a'
     }
     rule object-item {
       { $parse-object-item = True; }
-      ( <resource> {say "Object: $/"} |
-        <blank-node> {say "Object BN: $/"} |
-        <literal-text>  {say "Object Lit: $/"}
-      )
+      ( <resource> | <blank-node> | <literal-text> )
     }
 
     # '"' text '"'
@@ -170,7 +169,7 @@ package Rdf {
     }
 
     token e_character { <character> | <[\t\n\r]> }
-    token u_character { <+ character - [\x3e]> | '\>' {say "UChar: $/";} }
+    token u_character { <+ character - [\x3e]> | '\>' }
     token s_character { <+ e_character - [\x22]> | '\"' }
     token l_character { <e_character> | '\"' | \x9 | \xa | \xd }
 
