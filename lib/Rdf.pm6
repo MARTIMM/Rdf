@@ -93,7 +93,6 @@ say "Prefix & local name: '$prefix', '$local-name'";
       my $cache-name = $local-name;
       $cache-name ~~ s/ ^ 'http://' //;
       $cache-name ~~ s:g/ \/ /-/;
-say "P: $turtle-cache$cache-name";
 
       if ?$prefixes{$prefix} {
         note "Prefix '$prefix' in use and mapped to $prefixes{$prefix}"
@@ -117,9 +116,7 @@ say "Get source of $local-name";
         my $response = $ua.get($local-name);
         if $response.is-success {
           my $content = $response.content;
-  #say $content;
           spurt( $turtle-cache ~ $cache-name, $content);
-  say "Saved";
         }
 
         else {
@@ -128,7 +125,8 @@ say "Get source of $local-name";
 
         CATCH {
           default {
-            say .message;
+            say .message ~ ". Comand to get " ~ $local-name;
+#            .say;
           }
         }
       }

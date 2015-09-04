@@ -57,7 +57,7 @@ package Rdf {
       <object-item> ( ',' <object-item> )* { $parse-object-item = False; }
     }
 
-    rule verb { ( <predicate-item> | 'a' ) { $parse-predicate-item = False; } }
+    rule verb { ( <predicate-item> | 'a' {say "Predicate: $/"} ) { $parse-predicate-item = False; } }
 
     # White space detection is more simple because the perl6 grammar system
     # skips this automatically in rules. \n will take care of all kinds of
@@ -69,15 +69,18 @@ package Rdf {
 
     rule subject-item {
       { $parse-subject-item = True; }
-      ( <resource> {say "SI R: $/"} | <blank-node> {say "SI BN: $/"} )
+      ( <resource> {say "Subject: $/"} | <blank-node> {say "Subject BN: $/"} )
     }
     rule predicate-item {
       { $parse-predicate-item = True; }
-      <resource>
+      <resource> {say "Predicate: $/"}
     }
     rule object-item {
       { $parse-object-item = True; }
-      ( <resource> | <blank-node> | <literal> )
+      ( <resource> {say "Object: $/"} |
+        <blank-node> {say "Object BN: $/"} |
+        <literal-text>  {say "Object Lit: $/"}
+      )
     }
 
     # '"' text '"'
@@ -89,7 +92,7 @@ package Rdf {
     # number '.' number '^^' data-type-iri
     # '"' text '"' '^^' data-type-iri
     #
-    token literal {
+    token literal-text {
         <quoted-string> ( '@' <language> )?
       | <datatype-string>
       | integer
@@ -153,10 +156,10 @@ package Rdf {
 
     token name { <name_start_char> <name-char>* }
     token prefix-name { <+ name_start_char - [_]> <name-char>* }
-    token relative-uri { <u-character>* }
+    token relative-uri { <u_character>* }
     rule quoted-string { <string> | <long-string> }
-    token string { '"' ~ '"' <s-character>* }
-    token long-string { '"""' ~ '"""' <l-character>* }
+    token string { '"' <s_character>* '"' }
+    token long-string { '"""' <l_character>* '"""' }
 
     token character {
         '\u' <hex>**4
@@ -166,10 +169,10 @@ package Rdf {
       | <[\x5d..\x10ffff]>
     }
 
-    token e-character { <character> | <[\t\n\r]> }
-    token u-character { <+ character - [\x3e]> | '\>' {say "UChar: $/";} }
-    token s-character { <+ e-character - [\x22]> | '\"' }
-    token l-character { <e-character> | '\"' | \x9 | \xa | \xd }
+    token e_character { <character> | <[\t\n\r]> }
+    token u_character { <+ character - [\x3e]> | '\>' {say "UChar: $/";} }
+    token s_character { <+ e_character - [\x22]> | '\"' }
+    token l_character { <e_character> | '\"' | \x9 | \xa | \xd }
 
     token hex { <[0..9 a..f A..F]> }
   }
