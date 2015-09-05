@@ -15,10 +15,17 @@ package Rdf:ver<0.3.1>:auth<https://github.com/MARTIMM> {
   constant $NODE-GRAPH          = 0x0004;
 
   #-----------------------------------------------------------------------------
+  # Setup program-name. Path leading to the name of the program is removed.
+  #
+  my $program-name = $*PROGRAM-NAME;
+  $program-name ~~ s:g/ .*? <?before '/'> //;
+  $program-name ~~ s/ ^^ '/' //;
+
+  #-----------------------------------------------------------------------------
   # Setup the home directory for this program
   #
   my $home-dir = File::HomeDir.my_home;
-  my $pname = "$home-dir/.Turtle/" ~ $*PROGRAM-NAME;
+  my $pname = "$home-dir/.Turtle/" ~ $program-name;
   $pname ~~ s/\.          # Start with the dot
               <-[.]>+     # Then no dot may appear after that
               $           # til the end
@@ -36,16 +43,16 @@ package Rdf:ver<0.3.1>:auth<https://github.com/MARTIMM> {
   #-----------------------------------------------------------------------------
   # Setup the base url for this application. Can be modified later.
   #
-  our $base;
+  my $base;
   if !$base.defined {
-    $base = 'file:///' ~ $*PROGRAM-NAME;
+    $base = [~] 'file:///', $home-dir, '/', $program-name;
     $base ~~ s/ '.' <-[.]>+ $ //;
-    $base ~= '#';
-say "Base at start: $base";
+    $base ~= '/';
+#say "Base at start: $base";
   }
   
   else {
-say "Base defined as: $base";
+#say "Base defined as: $base";
   }
 
   # Array of types to check for
@@ -69,8 +76,6 @@ say "Base defined as: $base";
       'http://purl.org/dc/terms/',                   # dcterms  Dubin core
       'http://www.wikidata.org/entity/',             # wd       Wiki data
     );
-
-#    $prefixes{' '} = 'file:///' ~ $*PROGRAM-NAME ~ '#';
   }
 
 
@@ -80,8 +85,11 @@ say "Base defined as: $base";
   module Rdf-Tools {
 
     #---------------------------------------------------------------------------
+    # Prefixes are set only once for each prefix. Every time a new prefix
+    # is set the local-name is checked if the name is a URL for which
+    # its page can be cached.
     #
-    sub prefix (
+    sub set-prefix (
       Str :$prefix = ' ',
       Str :$local-name where $local-name.chars >= 1
     ) is export {
@@ -125,7 +133,7 @@ say "Get source of $local-name";
 
         CATCH {
           default {
-            say .message ~ ". Comand to get " ~ $local-name;
+            say .message ~ ". Command to get " ~ $local-name;
 #            .say;
           }
         }
@@ -162,8 +170,9 @@ say "Get source of $local-name";
 
     #---------------------------------------------------------------------------
     #
-    sub set-base ( Str $new-base --> Str ) is export {
+    sub set-base ( Str $new-base ) is export {
       $base = $new-base;
+say "Set base to $base";
     }
 
     #---------------------------------------------------------------------------
