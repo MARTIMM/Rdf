@@ -4,11 +4,6 @@ use Rdf;
 
 package Rdf {
 
-  our $seen-eol = False;
-
-  our $parse-subject-item;
-  our $parse-predicate-item;
-  our $parse-object-item;
 
   #-----------------------------------------------------------------------------
   #
@@ -17,11 +12,8 @@ package Rdf {
     #---------------------------------------------------------------------------
     #
     rule TOP { <statement>* }
-    rule statement { (
-          <directive> '.' { $Rdf::seen-eol = True; }
-        | <triples> '.' { $Rdf::seen-eol = True; }
-        | <white-space>
-      )
+    rule statement {
+      <directive> '.' | <triples> '.' | <white-space>
     }
 
     rule directive { <prefix-id> | <base-id> }
@@ -30,22 +22,19 @@ package Rdf {
     # '@prefix' ':' url .
     #
     rule prefix-id {
-      '@prefix' { $Rdf::seen-eol = False; }
-      <white-space>* <prefix-name>? ':' <uri-ref>
+      '@prefix' <white-space>* <prefix-name>? ':' <uri-ref>
     }
 
     # '@base' url .
     #
     rule base-id {
-      '@base' { $Rdf::seen-eol = False; }
-      <white-space>* <uri-ref>
+      '@base' <white-space>* <uri-ref>
     }
 
     # subject-item predicate object .
     #
     rule triples {
-      <subject-item> { $Rdf::seen-eol = $parse-subject-item = False; }
-      <predicateObjectList>
+      <subject-item> <predicateObjectList>
     }
 
     rule predicateObjectList {
@@ -56,7 +45,7 @@ package Rdf {
     }
 
     rule objectList {
-      <object-item> ( ',' <object-item> )* { $parse-object-item = False; }
+      <object-item> ( ',' <object-item> )*
     }
 
 #    rule verb { ( <predicate-item> | 'a' ) { $parse-predicate-item = False; } }
@@ -70,15 +59,12 @@ package Rdf {
     rule comment { '#' <-[\n]>* }
 
     rule subject-item {
-      { $parse-subject-item = True; }
       ( <resource> | <blank-node> )
     }
     rule predicate-item {
-      { $parse-predicate-item = True; }
       <resource> | 'a'
     }
     rule object-item {
-      { $parse-object-item = True; }
       ( <resource> | <blank-node> | <literal-text> )
     }
 
@@ -109,6 +95,7 @@ package Rdf {
         | \d+ <exponent>
       )
     }
+
     token exponent { <[eE]> <[+-]>? \d+ }
     token boolean { 'true' | 'false' }
 
@@ -148,17 +135,17 @@ package Rdf {
     }
 
     token name-char {
-        <name_start_char> | <[0..9 -]>
+        <.name_start_char> | <[0..9 -]>
       | "\x00B7" | <[\x0300..\x036F]>
       | <[\x203F..\x2040]>
     }
 
-    token name { <name_start_char> <name-char>* }
-    token prefix-name { <+ name_start_char - [_]> <name-char>* }
-    token relative-uri { <u_character>* }
-    rule quoted-string { <string> | <long-string> }
-    token string { '"' <s_character>* '"' }
-    token long-string { '"""' <l_character>* '"""' }
+    token name { <.name_start_char> <.name-char>* }
+    token prefix-name { <+ name_start_char - [_]> <.name-char>* }
+    token relative-uri { <.u_character>* }
+    rule quoted-string { <.string> | <.long-string> }
+    token string { '"' <.s_character>* '"' }
+    token long-string { '"""' <.l_character>* '"""' }
 
     token character {
         '\u' <hex>**4
@@ -168,10 +155,10 @@ package Rdf {
       | <[\x5d..\x10ffff]>
     }
 
-    token e_character { <character> | <[\t\n\r]> }
+    token e_character { <.character> | <[\t\n\r]> }
     token u_character { <+ character - [\x3e]> | '\>' }
     token s_character { <+ e_character - [\x22]> | '\"' }
-    token l_character { <e_character> | '\"' | \x9 | \xa | \xd }
+    token l_character { <.e_character> | '\"' | \x9 | \xa | \xd }
 
     token hex { <[0..9 a..f A..F]> }
   }

@@ -7,9 +7,6 @@ package Rdf {
   #
   class Turtle::Actions {
 
-    has Str $.prefix-name;
-    has Str $.relative-uri;
-
     has Str $.iri;
     has Str $.blank;
     has Str $.literal;
@@ -20,20 +17,46 @@ package Rdf {
 
     #---------------------------------------------------------------------------
     #
-    submethod BUILD (  ) {
-#say "\nAt 2: $Rdf::base";
-    }
-
-    #---------------------------------------------------------------------------
-    #
     method statement ( $match ) {
       say "\n", '-' x 80;
     }
 
     #---------------------------------------------------------------------------
     #
-    method prefix-name ( $match ) {
-      $!prefix-name = ~$match;
+    method prefix-id ( $match ) {
+
+      # Get the prefix name and uri from the match. Prefix name might be
+      # undefined.
+      #
+      my $pname= $match<prefix-name> ?? ~$match<prefix-name> !! '';
+      my $uri-ref = ~$match<uri-ref><relative-uri>;
+
+      # Check if prefix name is defined. If not then its a default prefix
+      #
+      if ?$pname {
+        set-prefix( :prefix($pname), :local-name($uri-ref));
+      }
+
+      else {
+        set-prefix(:local-name($uri-ref));
+      }
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    method base-id ( $match ) {
+
+      # Get the uri from the match.
+      #
+      my $uri-ref = ~$match<uri-ref><relative-uri>;
+
+      # Check if absolute url. if not, append to base
+      #
+      set-base(
+        $uri-ref ~~ m/ ^ \w+ '://' /
+          ?? $uri-ref
+          !! get-base() ~ $uri-ref
+      );
     }
 
     #---------------------------------------------------------------------------
@@ -56,54 +79,16 @@ package Rdf {
 
     #---------------------------------------------------------------------------
     #
-    method relative-uri ( $match ) {
-      $!relative-uri = ~$match;
-
-      # When uri is without protocol part than prepend the base upon it
-      #
-      if $!relative-uri !~~ m/ ^ \w+ '://' / {
-        $!relative-uri = get-base() ~ $!relative-uri;
-      }
-
-say "relative-uri: $!relative-uri";
-    }
+#    method relative-uri ( $match ) {
+#    }
 
     #---------------------------------------------------------------------------
     #
-    method prefix-id ( $match ) {
-      
-      # When no prefix text is given, set it as a default
-      #
-say ? $!prefix-name
-    ?? "Set prefix for $!prefix-name"
-    !! "Set default prefix";
+    method resource ( $match ) {
 
-      # Check if prefix name is defined. If not then its a default prefix
-      #
-      if ?$!prefix-name {
-        prefix( :prefix($!prefix-name), :local-name($!relative-uri));
-      }
-
-      else {
-        prefix(:local-name($!relative-uri));
-      }
-      
-      # Reset prefix to type object to recognize any default settings
-      #
-      $!prefix-name = Str;
-    }
-
-    #---------------------------------------------------------------------------
-    #
-    method base-id ( $match ) {
-      # Check if absolute url. if not, append to base
-      #
-      set-base(
-        $!relative-uri ~~ m/ ^ \w+ '://' /
-          ?? $!relative-uri
-          !! get-base() ~ $!relative-uri
-      );
-say "Set base for productions to $Rdf::base";
+      my $uri-ref = $match<uri-ref> // '';
+      my $qname= $match<qname> // '';
+say "Resource u/q: $uri-ref/$qname";
     }
   }
 }
@@ -118,18 +103,18 @@ say "Set base for productions to $Rdf::base";
       if ~$match ~~ m/ ^ '<' / {
         $s = get-base() ~ $!url;
       }
-      
+
       elsif ~$match ~~ m/ ^ ':' / {
         $s = $!iri;
         $s ~~ s/ ':' //;
       }
-      
+
       elsif ~$match ~~ m/ ':' / {
         $s = $!iri;
       }
-      
-      
-      
+
+
+
       $!subject = $s;
 say "Subject ", full-iri($!subject);
     }
@@ -141,16 +126,16 @@ say "Subject ", full-iri($!subject);
       if ~$match ~~ m/ ^ '<' / {
         $p = get-base() ~ $!url;
       }
-      
+
       elsif ~$match ~~ m/ ^ ':' / {
         $p = $!iri;
         $p ~~ s/ ':' //;
       }
-      
+
       elsif ~$match ~~ m/ ':' / {
         $p = $!iri;
       }
-      
+
       $!predicate = $p;
 say "Predicate ", full-iri($!predicate);
     }
@@ -162,16 +147,16 @@ say "Predicate ", full-iri($!predicate);
       if ~$match ~~ m/ ^ '<' / {
         $o = get-base() ~ $!url;
       }
-      
+
       elsif ~$match ~~ m/ ^ ':' / {
         $o = $!iri;
         $o ~~ s/ ':' //;
       }
-      
+
       elsif ~$match ~~ m/ ':' / {
         $o = $!iri;
       }
-      
+
       $!object = $o;
 say "Object ", full-iri($!object);
     }
