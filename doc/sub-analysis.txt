@@ -1,0 +1,11 @@
+Rdf
+        set-prefix
+        get-prefix
+        get-homedir
+        get-base
+        set-base
+        short-iri
+        full-iri
+        get-tuple-count
+        get-tuple-from-index
+        add-tuple
