@@ -8,22 +8,11 @@ package Rdf {
   #
   class IRI is Rdf::Node {
 
-    # This objects IRI
-    #
-    has Str $.iri;
-
     #---------------------------------------------------------------------------
     #
     submethod BUILD ( Str :$iri where ?$iri ) {
-      $!iri = $iri;
       self.set-value($iri);
-      
-      # Remove ' :' if it is a default prefix for the iri
-      #
-      my $si = short-iri($iri);
-      $si ~~ s/^ ' :' //;
-      self.set-short-value($si);
-
+      self.set-short-value(short-iri($iri));
       self.set-type($Rdf::NODE-IRI);
     }
   }

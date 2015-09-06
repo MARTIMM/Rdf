@@ -8,10 +8,6 @@ package Rdf {
   #
   class Blank is Rdf::Node {
 
-    # This objects blank node
-    #
-    has Str $.blank-node;
-
     #---------------------------------------------------------------------------
     #
     submethod BUILD ( :$blank-node is copy ) {
