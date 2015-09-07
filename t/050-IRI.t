@@ -5,39 +5,27 @@ use Rdf;
 use Rdf::Node-builder;
 
 #-------------------------------------------------------------------------------
-subtest {
-  my Rdf::Literal $l1 = Rdf::Node-builder.create('1920-10-23^^xsd:date');
-  isa-ok $l1, 'Literal', 'l1 is Literal';
-  is $l1.get-value,
-     '1920-10-23^^http://www.w3.org/2001/XMLSchema#date',
-     "IRI l1 = $l1";
-  is $l1.get-type, $Rdf::NODE-LITERAL, "Type l1 = {$l1.get-type}";
-}, 'Literal node';
+set-base('file:///perl-tests/');
+set-prefix( local-name => 'file://Perl6/Projects/Rdf#');
+set-prefix( prefix => 'def', local-name => 'file://local-terms#');
 
-#-------------------------------------------------------------------------------
 subtest {
-  my Rdf::Blank $b1 = Rdf::Node-builder.create('_:x');
-  isa-ok $b1, 'Blank', 'l1 is Blank';
-  is "$b1", '_:x', 'Blank node 1 = _:x';
-  is $b1.get-type, $Rdf::NODE-BLANK, "Type b1 = {$b1.get-type}";
-}, 'Blank node';
-
-#-------------------------------------------------------------------------------
-subtest {
-  my Rdf::IRI $i1 = Rdf::Node-builder.create('file://Perl6/Projects/Rdf-xyz#abc');
+  my Rdf::IRI $i1 = Rdf::Node-builder.create('<file://Perl6/Projects/Rdf-xyz#abc>');
   isa-ok $i1, 'IRI', 'i1 is IRI';
-  is "$i1", 'file://Perl6/Projects/Rdf-xyz#abc', "{$i1.perl}";
-  is $i1.get-type, $Rdf::NODE-IRI, "Iri type code is $Rdf::NODE-IRI";
+  is ~$i1, 'file://Perl6/Projects/Rdf-xyz#abc', "Node i1: $i1";
 
-  my Rdf::Node $i2 = Rdf::Node-builder.create('abc');
-  nok ?$i2, "Node i2 not defined";
+  my Rdf::Node $i2 = Rdf::Node-builder.create('<abc>');
+  is ~$i2, "file:///perl-tests/abc", "Node i2: $i2";
 
-  set-prefix( local-name => 'file://Perl6/Projects/Rdf#' );
-  $i2 = Rdf::Node-builder.create('abc');
-  is "$i2", 'file://Perl6/Projects/Rdf#abc', "IRI i2 = $i2";
+  my Rdf::Node $i3 = Rdf::Node-builder.create(':abc');
+  is ~$i3, 'file://Perl6/Projects/Rdf#abc', "Node i3: $i3";
 
   my Rdf::Node $i4 = Rdf::Node-builder.create('def:abc');
-  nok $i4, "IRI i4 = undefined";
+  is ~$i4, 'file://local-terms#abc', "Node i4: $i4";
+
+  my Rdf::Node $i5 = Rdf::Node-builder.create('x:abc');
+  is ~$i5, 'http://martimm.github.io/Unknown-Prefix#abc', "Node i5: $i5";
+
 }, 'Iri node';
 
 #-------------------------------------------------------------------------------
@@ -47,3 +35,27 @@ done();
 exit(0);
 
 
+=finish
+
+#-------------------------------------------------------------------------------
+subtest {
+  is full-iri('xsd:string'),
+     'http://www.w3.org/2001/XMLSchema#string',
+     "{full-iri('xsd:string')}";
+
+  is full-iri('abc'),
+     'file://Perl6/Projects/Rdf#abc',
+     "{full-iri('abc')}";
+
+  is full-iri('xyz:abc'),
+     Str,
+     "'xyz:abc' not translated";
+
+  set-prefix(
+    prefix => 'xyz',
+    local-name => 'file://Perl6/Projects/Rdf-xyz#'
+  );
+  is full-iri('xyz:abc'),
+     'file://Perl6/Projects/Rdf-xyz#abc',
+     "{full-iri('xyz:abc')}";
+}, 'convert iri';
