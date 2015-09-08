@@ -15,37 +15,56 @@ package Rdf {
     # Create literal node if fully specified string is given
     #
     method create (
-      Str $iri-string where $iri-string.chars >= 1
+      Str $iri-string is copy where $iri-string.chars >= 1
       --> Rdf::Node
     ) {
 
       my Rdf::Node $node;
 
-      # Check if short iri is a fully specified literal node.
-      #
-      if $iri-string ~~ m/ '^^' / {
-        $node = Rdf::Literal.new(:lexical-form($iri-string));
-      }
-
       # Check if short iri is a blank node. All blank nodes are written
       # like _:local-name
       #
-      elsif $iri-string ~~ m/^ '_:' \w+/ {
+      if $iri-string ~~ m/^ '_:' \w+/ {
         $node = Rdf::Blank.new(:blank-node($iri-string));
       }
 
-      # Check if short iri is a full iri. Check <protocol://>.
+      # Check if iri is a full iri..
       #
-      elsif $iri-string ~~ m/^ \w+ '://' / {
+      elsif $iri-string ~~ m/^ '<' / or $iri-string ~~ m/ ':' / {
         $node = Rdf::IRI.new(:iri($iri-string));
       }
 
+      # The rest must be a literal
+      #
       else {
-        my $fi = full-iri($iri-string);
-        $node = Rdf::IRI.new(:iri($fi)) if ?$fi;
+        $node = Rdf::Literal.new(:literal($iri-string));
       }
 
       return $node;
     }
   }
 }
+
+
+
+=finish
+
+      # Check if iri is a full iri..
+      #
+      elsif $iri-string ~~ m/^ '<' / {
+        $iri-string ~~ s/^ '<'//;
+        $iri-string ~~ s/'>' \s* $//;
+
+        $iri-string = get-base() ~ $iri-string
+          unless $iri-string ~~ m/^ \w+ '://' /;
+#say "iri --> $iri-string";
+        $node = Rdf::IRI.new(:iri($iri-string));
+      }
+
+      # Check if iri is a short iri..
+      #
+      elsif $iri-string ~~ m/ ':' / {
+        my $fi = full-iri($iri-string);
+#say "iri --> $fi";
+        $node = Rdf::IRI.new(:iri($fi));
+      }
