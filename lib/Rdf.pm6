@@ -25,6 +25,7 @@ package Rdf:ver<0.3.1>:auth<https://github.com/MARTIMM> {
   # Setup the home directory for this program
   #
   my $home-dir = File::HomeDir.my_home;
+if 0 { # Not yet useful
   my $pname = "$home-dir/.Turtle/" ~ $program-name;
   $pname ~~ s/\.          # Start with the dot
               <-[.]>+     # Then no dot may appear after that
@@ -33,6 +34,7 @@ package Rdf:ver<0.3.1>:auth<https://github.com/MARTIMM> {
 
   mkdir( $pname, :8<755>) unless $pname.IO ~~ :d;
   our $home-dir-path = "$pname/";
+}
 
   #-----------------------------------------------------------------------------
   # Setup the turtle cache directory
@@ -50,7 +52,7 @@ package Rdf:ver<0.3.1>:auth<https://github.com/MARTIMM> {
     $base ~= '/';
 #say "Base at start: $base";
   }
-  
+
   else {
 #say "Base defined as: $base";
   }
@@ -67,7 +69,8 @@ package Rdf:ver<0.3.1>:auth<https://github.com/MARTIMM> {
   # Set some known prefixes with their iri
   #
   if ! $prefixes.keys {
-    $prefixes<rdf rdfs xsd foaf schema dcterms wd> = @(
+    $prefixes<__Unknown_Prefix__ rdf rdfs xsd foaf schema dcterms wd> = @(
+      'http://martimm.github.io/Unknown-Prefix#',
       'http://www.w3.org/1999/02/22-rdf-syntax-ns#', # rdf
       'http://www.w3.org/2000/01/rdf-schema#',       # rdfs
       'http://www.w3.org/2001/XMLSchema#',           # xsd      data types
@@ -77,7 +80,6 @@ package Rdf:ver<0.3.1>:auth<https://github.com/MARTIMM> {
       'http://www.wikidata.org/entity/',             # wd       Wiki data
     );
   }
-
 
   #-----------------------------------------------------------------------------
   # Exported routines
@@ -173,55 +175,6 @@ say "Get source of $local-name";
     sub set-base ( Str $new-base ) is export {
       $base = $new-base;
 say "Set base to $base";
-    }
-
-    #---------------------------------------------------------------------------
-    # Convert log notation iri to a short one
-    #
-    sub short-iri ( Str $full-iri is copy --> Str ) is export {
-
-#say "FI: $full-iri";
-      for $prefixes.keys -> $k {
-#say "KV: $k => $prefixes{$k}";
-        my $uri = $prefixes{$k};
-        if $full-iri ~~ m/ $uri / {
-          $full-iri ~~ s/ $uri /$k:/;
-          last;
-        }
-      }
-
-#say "SI: $full-iri";
-      return $full-iri;
-    }
-
-    #---------------------------------------------------------------------------
-    # Convert short notation iri into full iri format
-    # e.g. xsd:long --> http://www.w3.org/2001/XMLSchema#long
-    #
-    sub full-iri ( Str $iri-string --> Str ) is export {
-
-      # An iri can be a short iri of only the <local name> or a
-      # <prefix:local name> combination. If split returns two results its the
-      # second otherwise its the first.
-      #
-      ( my $prefix, my $local-name) = $iri-string.split(':');
-
-      # prefix and localname if there is a ':'
-      #
-      my Str $site-iri;
-      if ?$local-name #`{{Then there is also a prefix}} {
-        $site-iri = $prefixes{$prefix} ~ $local-name
-          if $prefixes{$prefix}:exists;
-      }
-
-      # Only localname in prefix, prefix is default, use prefix ' '.
-      #
-      else {
-        $site-iri = $prefixes{' '} ~ $prefix
-          if $prefixes{' '}:exists;
-      }
-
-      return $site-iri;
     }
   }
 }
