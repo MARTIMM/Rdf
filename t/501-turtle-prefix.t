@@ -29,13 +29,13 @@ subtest {
 #-------------------------------------------------------------------------------
 subtest {
 
-  ok get-prefix().defined, 'No default prefix';
+  is get-prefix(), '', 'No default prefix';
   is get-prefix('rdf'),
      'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
      "rdf defined as {get-prefix('rdf')}";
 
   my Str $content = qq:to/EOTURTLE/;
-  @prefix : <local-path#> .
+  @prefix : <relative-path#> .
   @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
   @prefix pf1: <http://no-special-site.com> .
   EOTURTLE
@@ -43,6 +43,9 @@ subtest {
   my Match $status = $t.parse(:$content);
   ok $status ~~ Match, "Parse prefixes ok";
 
+  is get-prefix(),
+     'http://www.w3.org/1999/02/22-rdf-syntax-ns/relative-path#',
+     "Default prefix {get-prefix()}";
   is get-prefix('pf1'),
      'http://no-special-site.com',
      "pf1 defined as {get-prefix('pf1')}";
