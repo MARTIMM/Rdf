@@ -9,7 +9,6 @@ my Rdf::Literal $lit;
 # See also http://www.w3.org/TR/rdf11-concepts/
 #-------------------------------------------------------------------------------
 subtest {
-
   $lit .= new(:literal('"abcdef"'));
   ok $lit.isa('Literal'), 'Test object type';
   is $lit.get-value(),

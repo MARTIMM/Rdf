@@ -30,8 +30,7 @@ say "Lit Q: ", $literal;
       #
       if $literal ~~ m/ ^ <Rdf::Turtle::Grammar::literal-text> $ / {
         my $l = $/<Rdf::Turtle::Grammar::literal-text>;
-#
-say "\nMatch: ", $l.perl;
+#say "\nMatch: ", $l.perl;
 
         # Check for strings
         #
@@ -59,7 +58,7 @@ say "\nMatch: ", $l.perl;
 
         # Check for data type strings
         #
-        if $l<datatype-string>:exists {
+        elsif $l<datatype-string>:exists {
           my $ds = ~$l<datatype-string>;
 
           ( my $lt, my $dt) = $ds.split('^^');
@@ -79,13 +78,20 @@ say "DTS: ~$l<datatype-string>, $!lexical-form, $!datatype";
 
         # Check for integers
         #
-        if $l<integer>:exists {
+        elsif $l<integer>:exists {
           $!lexical-form = cleanup-integer(~$l<integer>);
           $!datatype = 'xsd:integer';
 
           self!set-lv(:quotes('"'));
           self!set-sv(:quotes(''));
         }
+      }
+
+      # Literal expression not recognized
+      #
+      else {
+#say "\nMatch: ", $/.perl;
+        note "Literal expression '$literal' not supported";
       }
     }
 
