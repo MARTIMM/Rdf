@@ -13,7 +13,7 @@ package Rdf {
     #
     rule TOP { <statement>* }
     rule statement {
-      <directive> '.' | <triples> '.' | <white-space>
+      <directive> '.' | <triples> '.' | <.white-space>
     }
 
     rule directive { <prefix-id> | <base-id> }
@@ -21,52 +21,40 @@ package Rdf {
     # '@prefix' prefix-name ':' url .
     # '@prefix' ':' url .
     #
-    rule prefix-id {
-      '@prefix' <white-space>* <prefix-name>? ':' <uri-ref>
-    }
+    rule prefix-id { '@prefix' <.white-space>* <prefix-name>? ':' <uri-ref> }
 
     # '@base' url .
     #
-    rule base-id {
-      '@base' <white-space>* <uri-ref>
-    }
+    rule base-id { '@base' <.white-space>* <uri-ref> }
 
     # subject-item predicate object .
     #
-    rule triples {
-      <subject-item> <predicateObjectList>
+    rule triples { <subject-item> <predicate-object-list> }
+
+    rule predicate-object-list {
+      <predicate-item> <object-list>
+      ( ';' <predicate-item> <object-list> )* ';'?
     }
 
-    rule predicateObjectList {
-#      <verb> <objectList>
-#      ( ';' <verb> <objectList> )* ( ';' )?
-      <predicate-item> <objectList>
-      ( ';' <predicate-item> <objectList> )* ( ';' )?
-    }
-
-    rule objectList {
-      <object-item> ( ',' <object-item> )*
-    }
-
-#    rule verb { ( <predicate-item> | 'a' ) { $parse-predicate-item = False; } }
+    rule object-list { <object-item> ( ',' <object-item> )* }
 
     # White space detection is more simple because the perl6 grammar system
     # skips this automatically in rules. \n will take care of all kinds of
     # newline characters depending on operating system.
     # (token ws is already declared by perl!!)
     #
-    rule white-space { <comment> }
+    rule white-space { <.comment> }
     rule comment { '#' <-[\n]>* }
 
-    rule subject-item {
-      ( <resource> | <blank-node> )
-    }
-    rule predicate-item {
-      <resource> | 'a'
-    }
-    rule object-item {
-      ( <resource> | <blank-node> | <literal-text> )
-    }
+    rule subject-item { ( <.resource> | <.blank-node> ) }
+
+    # Turtle predicate 'a' is same as rdf:type. This also means that predicate
+    # rdf must be declared as http://www.w3.org/1999/02/22-rdf-syntax-ns#
+    # in Rdf.pm6.
+    #
+    rule predicate-item { <.resource> | 'a' }
+
+    rule object-item { ( <.resource> | <.blank-node> | <.literal-text> ) }
 
     # '"' text '"'
     # '"""' long piece of text '"""'
@@ -78,21 +66,21 @@ package Rdf {
     # '"' text '"' '^^' data-type-iri
     #
     token literal-text {
-        <quoted-string> ( '@' <language> )?
-      | <datatype-string>
-      | integer
-      | double
-      | decimal
-      | boolean
+       <quoted-string> ( '@' <language> )? |
+       <datatype-string> |
+       <integer>         |
+       <double>          |
+       <decimal>         |
+       <boolean>
     }
 
-    token datatype-string { <quoted-string> '^^' <resource> }
+    token datatype-string { <.quoted-string> '^^' <.resource> }
     token integer { <[+-]>? \d+ }
     token double {
       <[+-]>? (
           \d+ '.' \d*
-        | '.' \d+ <exponent>
-        | \d+ <exponent>
+        | '.' \d+ <.exponent>
+        | \d+ <.exponent>
       )
     }
 
@@ -104,7 +92,7 @@ package Rdf {
     rule blank-node {
         <node-id>
       | '[]'
-      | '[' <predicateObjectList> ']'
+      | '[' <predicate-object-list> ']'
       | <collection>
     }
 
@@ -118,7 +106,7 @@ package Rdf {
     # prefix ':'
     # ':'
     #
-    token resource { ( <uri-ref> | <qname> ) }
+    token resource { <uri-ref> | <qname> }
     token uri-ref { '<' ~ '>' <relative-uri> }
     rule qname { <prefix-name>? ':' <name>? }
 
