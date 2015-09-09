@@ -66,15 +66,15 @@ package Rdf {
     # '"' text '"' '^^' data-type-iri
     #
     token literal-text {
-       <quoted-string> ( '@' <language> )? |
-       <datatype-string> |
-       <integer>         |
-       <double>          |
-       <decimal>         |
-       <boolean>
+      <integer>         |
+      <double>          |
+      <decimal>         |
+      <boolean>         |
+      <datatype-string> |
+      <quoted-string> ( '@' <language> )?
     }
 
-    token datatype-string { <.quoted-string> '^^' <.resource> }
+    token datatype-string { <quoted-string> '^^' <resource> }
     token integer { <[+-]>? \d+ }
     token double {
       <[+-]>? (
@@ -84,6 +84,7 @@ package Rdf {
       )
     }
 
+    token decimal { <[-+]>? [ \d+ '.' \d* | '.' \d+ | \d+ ] }
     token exponent { <[eE]> <[+-]>? \d+ }
     token boolean { 'true' | 'false' }
 
@@ -104,6 +105,7 @@ package Rdf {
     # '<' url '>'
     # prefix ':' local-name
     # prefix ':'
+    # ':' local-name
     # ':'
     #
     token resource { <uri-ref> | <qname> }
@@ -132,8 +134,8 @@ package Rdf {
     token prefix-name { <+ name_start_char - [_]> <.name-char>* }
     token relative-uri { <.u_character>* }
     rule quoted-string { <.string> | <.long-string> }
-    token string { '"' <.s_character>* '"' }
-    token long-string { '"""' <.l_character>* '"""' }
+    token string { '"' ~ '"' <.s_character>* }
+    token long-string { '"""' ~ '"""' <.l_character>* }
 
     token character {
         '\u' <hex>**4
