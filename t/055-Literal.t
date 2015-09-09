@@ -9,6 +9,61 @@ my Rdf::Literal $lit;
 # See also http://www.w3.org/TR/rdf11-concepts/
 #-------------------------------------------------------------------------------
 subtest {
+  $lit .= new(:literal('001.30e6'));
+  is $lit.get-value(),
+     '"1.3e6"^^<http://www.w3.org/2001/XMLSchema#double>',
+     "Lit: {$lit.get-value()}";
+  is $lit.get-short-value(), '1.3e6', "Lit short: {$lit.get-short-value()}";
+
+}, 'literal double';
+
+#-------------------------------------------------------------------------------
+subtest {
+  $lit .= new(:literal('03.10'));
+  is $lit.get-value(),
+     '"3.1"^^<http://www.w3.org/2001/XMLSchema#decimal>',
+     "Lit: {$lit.get-value()}";
+  is $lit.get-short-value(), '3.1', "Lit short: {$lit.get-short-value()}";
+
+}, 'literal decimal';
+
+#-------------------------------------------------------------------------------
+subtest {
+  $lit .= new(:literal('-0010'));
+  is $lit.get-value(),
+     '"-10"^^<http://www.w3.org/2001/XMLSchema#integer>',
+     "Lit: {$lit.get-value()}";
+  is $lit.get-short-value(), '-10', "Lit: {$lit.get-short-value()}";
+
+}, 'literal integer';
+
+#-------------------------------------------------------------------------------
+subtest {
+  $lit .= new(:literal('true'));
+  is $lit.get-value(),
+     '"true"^^<http://www.w3.org/2001/XMLSchema#boolean>',
+     "Lit: {$lit.get-value()}";
+  is $lit.get-short-value(), 'true', "Lit: {$lit.get-short-value()}";
+  $lit .= new(:literal('false'));
+  is $lit.get-value(),
+     '"false"^^<http://www.w3.org/2001/XMLSchema#boolean>',
+     "Lit: {$lit.get-value()}";
+  is $lit.get-short-value(), 'false', "Lit: {$lit.get-short-value()}";
+
+}, 'literal boolean';
+
+#-------------------------------------------------------------------------------
+subtest {
+  $lit .= new(:literal('"-03.10e50"^^xsd:double'));
+  is $lit.get-value(),
+     '"-3.1e50"^^<http://www.w3.org/2001/XMLSchema#double>',
+     "Lit: {$lit.get-value()}";
+  is $lit.get-short-value(), '-3.1e50', "Lit short: {$lit.get-short-value()}";
+
+}, 'literal datatype string';
+
+#-------------------------------------------------------------------------------
+subtest {
   $lit .= new(:literal('"abcdef"'));
   ok $lit.isa('Literal'), 'Test object type';
   is $lit.get-value(),
@@ -20,29 +75,9 @@ subtest {
   is $lit.get-value(),
      '"abcdef"@nl^^<http://www.w3.org/1999/02/22-rdf-syntax-ns#langString>',
      "Lit: {$lit.get-value()}";
-  is $lit.get-short-value(), '"abcdef"@nl', "Lit: {$lit.get-short-value()}";
+  is $lit.get-short-value(), '"abcdef"@nl', "Lit short: {$lit.get-short-value()}";
 
 }, 'literal string';
-
-#-------------------------------------------------------------------------------
-subtest {
-  $lit .= new(:literal('"-03.10e50"^^xsd:double'));
-  is $lit.get-value(),
-     '"-3.1e50"^^<http://www.w3.org/2001/XMLSchema#double>',
-     "Lit: {$lit.get-value()}";
-  is $lit.get-short-value(), '-3.1e50', "Lit: {$lit.get-short-value()}";
-
-}, 'literal datatype string';
-
-#-------------------------------------------------------------------------------
-subtest {
-  $lit .= new(:literal('-0010'));
-  is $lit.get-value(),
-     '"-10"^^<http://www.w3.org/2001/XMLSchema#integer>',
-     "Lit: {$lit.get-value()}";
-  is $lit.get-short-value(), '-10', "Lit: {$lit.get-short-value()}";
-
-}, 'literal integer';
 
 #-------------------------------------------------------------------------------
 # Cleanup

@@ -20,7 +20,7 @@ package Rdf {
     # rdf:langString.
     #
     submethod BUILD ( Str :$literal ) {
-      
+
       # Language is not used for many data types
       #
       $!language = '';
@@ -32,29 +32,43 @@ say "Lit Q: ", $literal;
         my $l = $/<Rdf::Turtle::Grammar::literal-text>;
 #say "\nMatch: ", $l.perl;
 
-        # Check for strings
+        # Check for integers
         #
-        if $l<quoted-string>:exists {
-          $!lexical-form = ~$l<quoted-string>;
-          $!lexical-form ~~ s/^ '"' //;
-          $!lexical-form ~~ s/ '"' $//;
+        if $l<double>:exists {
+          $!lexical-form = cleanup-double(~$l<double>);
+          $!datatype = 'xsd:double';
 
-          # When language is defined, it will be in a list. This because
-          # of the ()* in the regex
-          #
-          if ?$l.elems and $l[0]<language>:exists {
-            $!language = ~$l[0]<language>;
-            $!datatype = 'rdf:langString';
-          }
-
-          else {
-            $!datatype = 'xsd:string';
-          }
-
-          my $quotes = $!lexical-form ~~ m/ \n / ?? '"""' !! '"';
-          self!set-lv(:$quotes);
-          self!set-sv(:$quotes);
+          self!set-lv(:quotes('"'));
+          self!set-sv(:quotes(''));
         }
+
+
+        elsif $l<decimal>:exists {
+          $!lexical-form = cleanup-decimal(~$l<decimal>);
+          $!datatype = 'xsd:decimal';
+
+          self!set-lv(:quotes('"'));
+          self!set-sv(:quotes(''));
+        }
+
+
+        elsif $l<integer>:exists {
+          $!lexical-form = cleanup-integer(~$l<integer>);
+          $!datatype = 'xsd:integer';
+
+          self!set-lv(:quotes('"'));
+          self!set-sv(:quotes(''));
+        }
+
+
+        elsif $l<boolean>:exists {
+          $!lexical-form = ~$l<boolean>;
+          $!datatype = 'xsd:boolean';
+
+          self!set-lv(:quotes('"'));
+          self!set-sv(:quotes(''));
+        }
+
 
         # Check for data type strings
         #
@@ -76,14 +90,28 @@ say "DTS: ~$l<datatype-string>, $!lexical-form, $!datatype";
         }
 
 
-        # Check for integers
+        # Check for strings
         #
-        elsif $l<integer>:exists {
-          $!lexical-form = cleanup-integer(~$l<integer>);
-          $!datatype = 'xsd:integer';
+        elsif $l<quoted-string>:exists {
+          $!lexical-form = ~$l<quoted-string>;
+          $!lexical-form ~~ s/^ '"' //;
+          $!lexical-form ~~ s/ '"' $//;
 
-          self!set-lv(:quotes('"'));
-          self!set-sv(:quotes(''));
+          # When language is defined, it will be in a list. This because
+          # of the ()* in the regex
+          #
+          if ?$l.elems and $l[0]<language>:exists {
+            $!language = ~$l[0]<language>;
+            $!datatype = 'rdf:langString';
+          }
+
+          else {
+            $!datatype = 'xsd:string';
+          }
+
+          my $quotes = $!lexical-form ~~ m/ \n / ?? '"""' !! '"';
+          self!set-lv(:$quotes);
+          self!set-sv(:$quotes);
         }
       }
 
@@ -103,6 +131,19 @@ say "DTS: ~$l<datatype-string>, $!lexical-form, $!datatype";
       #
       if $text ~~ m/ '.' .*? 'e' / {
         $text ~~ s/ '0'+ 'e' /e/;
+      }
+
+      return cleanup-integer($text);
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    sub cleanup-decimal ( Str $text is copy --> Str ) {
+
+      # Remove trailing zeros after '.' and before the end
+      #
+      if $text ~~ m/ '.' .*? $/ {
+        $text ~~ s/ '0'+ $//;
       }
 
       return cleanup-integer($text);
@@ -218,12 +259,12 @@ say "DTS: ~$l<datatype-string>, $!lexical-form, $!datatype";
         $!language = $/[0];
         $lexical-form ~~ s/ '@' (\w+) $ //;
       }
-      
+
       elsif ?$datatype {
         $!lexical-form = $lexical-form;
         $!datatype = full-iri($datatype);
       }
-      
+
       else {
         $!lexical-form = $lexical-form;
         $!datatype = full-iri('xsd:string');
@@ -271,7 +312,7 @@ say "$lexical-form, $lang-tag";
             die "Datatype wrong for language tagged strings";
           }
         }
-        
+
         $!lexical-form = $lform;
         $!datatype = full-iri($datatype);
 say "$!lexical-form, $!datatype, $datatype";
@@ -304,7 +345,7 @@ say "$!lexical-form, $!datatype, $datatype";
     multi submethod xBUILD ( Str :$lexical-form, Str :$lang-tag is copy ) {
 
       my $dt;
-      
+
       # Normalize to lowercase
       #
       $lang-tag.lc if $lang-tag.defined;

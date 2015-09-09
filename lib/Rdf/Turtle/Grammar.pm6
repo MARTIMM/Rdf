@@ -66,25 +66,30 @@ package Rdf {
     # '"' text '"' '^^' data-type-iri
     #
     token literal-text {
-      <integer>         |
       <double>          |
       <decimal>         |
+      <integer>         |
       <boolean>         |
       <datatype-string> |
       <quoted-string> ( '@' <language> )?
     }
 
-    token datatype-string { <quoted-string> '^^' <resource> }
-    token integer { <[+-]>? \d+ }
     token double {
-      <[+-]>? (
-          \d+ '.' \d*
-        | '.' \d+ <.exponent>
-        | \d+ <.exponent>
-      )
+      <[+-]>? [
+        \d+ '.' \d* <.exponent> |
+        '.' \d+ <.exponent> |
+        \d+ <.exponent>
+      ]
     }
 
-    token decimal { <[-+]>? [ \d+ '.' \d* | '.' \d+ | \d+ ] }
+    token datatype-string { <quoted-string> '^^' <resource> }
+    token integer { <[+-]>? \d+ }
+
+# Bug in the bnf rule 18 on page
+# http://www.w3.org/TeamSubmission/turtle/#relativeURI
+#    token decimal { <[+-]>? [ \d+ '.' \d* | '.' \d+ | \d+ ] }
+
+    token decimal { <[+-]>? [ \d+ '.' \d* | '.' \d+ ] }
     token exponent { <[eE]> <[+-]>? \d+ }
     token boolean { 'true' | 'false' }
 
