@@ -84,17 +84,3 @@ subtest {
 #
 done();
 exit(0);
-
-
-=finish
-#-------------------------------------------------------------------------------
-subtest {
-  my Rdf::Literal $l1 = Rdf::Node-builder.create('1920-10-23^^xsd:date');
-  isa-ok $l1, 'Literal', 'l1 is Literal';
-  is $l1.get-value,
-     '1920-10-23^^<http://www.w3.org/2001/XMLSchema#date>',
-     "IRI l1 = $l1";
-  is $l1.get-type, $Rdf::NODE-LITERAL, "Type l1 = {$l1.get-type}";
-}, 'Literal node';
-
-

@@ -1,34 +1,16 @@
 use v6;
-use Rdf;
+#use Rdf;
 
 package Rdf {
 
   class Node {
 
-    has Int $!type;
     has Str $!value;
     has Str $!short-value;
     
     # Array of Rdf::Rdf-Tuple
     #
     has Array $tuples = [];
-
-    #---------------------------------------------------------------------------
-    #
-    method get-type ( --> Int ) {
-      return $!type;
-    }
-
-    #---------------------------------------------------------------------------
-    #
-    method set-type (
-      Int $type
-#      Int $type where $type ~~ any(
-#        $Rdf::NODE-IRI, $Rdf::NODE-BLANK, $Rdf::NODE-LITERAL, $Rdf::NODE-GRAPH
-#      )
-    ) {
-      $!type = $type;
-    }
 
     #---------------------------------------------------------------------------
     #

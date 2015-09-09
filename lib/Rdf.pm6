@@ -6,15 +6,6 @@ use HTTP::UserAgent;
 package Rdf:ver<0.3.1>:auth<https://github.com/MARTIMM> {
 
   #-----------------------------------------------------------------------------
-  # Definition of used constants
-  # Node types
-  #
-  constant $NODE-IRI            = 0x0001;
-  constant $NODE-BLANK          = 0x0002;
-  constant $NODE-LITERAL        = 0x0003;
-  constant $NODE-GRAPH          = 0x0004;
-
-  #-----------------------------------------------------------------------------
   # Setup program-name. Path leading to the name of the program is removed.
   #
   my $program-name = $*PROGRAM-NAME;
@@ -361,3 +352,4 @@ say "Set base to $base";
     $PREDICATE,
     $OBJECT,
   );
+

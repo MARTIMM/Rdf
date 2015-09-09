@@ -45,26 +45,3 @@ package Rdf {
   }
 }
 
-
-
-=finish
-
-      # Check if iri is a full iri..
-      #
-      elsif $iri-string ~~ m/^ '<' / {
-        $iri-string ~~ s/^ '<'//;
-        $iri-string ~~ s/'>' \s* $//;
-
-        $iri-string = get-base() ~ $iri-string
-          unless $iri-string ~~ m/^ \w+ '://' /;
-#say "iri --> $iri-string";
-        $node = Rdf::IRI.new(:iri($iri-string));
-      }
-
-      # Check if iri is a short iri..
-      #
-      elsif $iri-string ~~ m/ ':' / {
-        my $fi = full-iri($iri-string);
-#say "iri --> $fi";
-        $node = Rdf::IRI.new(:iri($fi));
-      }

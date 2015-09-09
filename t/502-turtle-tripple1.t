@@ -3,9 +3,37 @@ use Test;
 
 use Rdf;
 use Rdf::Turtle;
+use Rdf::Rdf-tuple;
 
 my Rdf::Turtle $t .= new;
 
+
+#-------------------------------------------------------------------------------
+subtest {
+  my Str $content = qq:to/EOTURTLE/;
+
+  <a1> <b1> <c1> .
+
+  <a2> <b2> <c2> ;
+       <b3> <c3> .
+
+  <a4> a <c4> .
+
+  <a4> a <c4>, <c4a>, <c4b> .
+
+  EOTURTLE
+
+  my Match $status = $t.parse(:$content);
+  ok $status ~~ Match, "Parse tuple ok";
+
+  is get-tuple-count(), 7, "Number of 3-tuples found is {get-tuple-count()}";
+
+}, 'default relative triple';
+
+done();
+exit(0);
+
+=finish
 
 #-------------------------------------------------------------------------------
 subtest {

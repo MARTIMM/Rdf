@@ -22,9 +22,9 @@ package Rdf {
     #---------------------------------------------------------------------------
     #
     submethod BUILD (
-      :$subject where $subject.get-type ~~ any($Rdf::NODE-IRI,$Rdf::NODE-BLANK),
-      :$predicate where $predicate.get-type eq $Rdf::NODE-IRI,
-      :$object where $object.get-type ~~ any($Rdf::NODE-Literal,$Rdf::NODE-IRI,$Rdf::NODE-BLANK)
+      :$subject,
+      :$predicate,
+      :$object
     ) {
       $!subject = $subject;
       $subject.save-tuple(self);
@@ -51,9 +51,9 @@ package Rdf {
     # Create a 3-tuple of a subject - predicate - object relationship
     #
     sub tuple (
-      $subject where $subject ~~ any(Str,Rdf::Rdf-tuple),
-      Str $predicate is copy where $subject ~~ any(Str,Rdf::Rdf-tuple),
-      $object where $object ~~ any(Str,Rdf::Rdf-tuple)
+      $subject where $subject ~~ any( Str, Rdf::Rdf-tuple),
+      Str $predicate is copy where $subject ~~ any( Str, Rdf::Rdf-tuple),
+      $object where $object ~~ any( Str, Rdf::Rdf-tuple)
       --> Rdf::Rdf-tuple
     ) is export {
 

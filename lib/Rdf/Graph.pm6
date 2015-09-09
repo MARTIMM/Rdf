@@ -17,7 +17,6 @@ package Rdf {
     #
     submethod BUILD ( :$graph ) {
       $!graph = $graph;
-      self.set-type($Rdf::NODE-GRAPH);
     }
   }
 }
