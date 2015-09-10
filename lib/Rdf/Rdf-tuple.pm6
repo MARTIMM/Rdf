@@ -1,7 +1,12 @@
 use v6;
 use Rdf;
 use Rdf::Node;
-use Rdf::Node-builder;
+#use Rdf::Node-builder;
+use Rdf::IRI;
+use Rdf::Graph;
+use Rdf::Blank;
+use Rdf::Literal;
+
 
 package Rdf {
 
@@ -48,7 +53,10 @@ package Rdf {
   module Tuple-Tools {
 
     #---------------------------------------------------------------------------
-    # Create a 3-tuple of a subject - predicate - object relationship
+    # Create a 3-tuple of a subject - predicate - object relationship. For each
+    # of the arguments this can be a string or a tuple. When it is a tuple, take
+    # the subject from the tuple and use it as a string for the subject,
+    # predicate or object.
     #
     sub tuple (
       $subject where $subject ~~ any( Str, Rdf::Rdf-tuple),
@@ -57,37 +65,68 @@ package Rdf {
       --> Rdf::Rdf-tuple
     ) is export {
 
+      # Get subject
+      #
       my Rdf::Node $s = $subject ~~ Rdf::Rdf-tuple
         ?? $subject.get-subject
-        !! Rdf::Node-builder.create($subject);
-#say "TT: Subject: $s";
+        !! create-node($subject);
 
       die "Node for $subject is not created" unless $s.defined;
 
-      # Turtle predicate 'a' is same as rdf:type. This also means that predicate
-      # rdf must be declared as http://www.w3.org/1999/02/22-rdf-syntax-ns#
-      # in Rdf.pm6.
+      # Get predicate
       #
-      $predicate = 'rdf:type' if $predicate eq 'a';
-      my Rdf::Node $p = Rdf::Node-builder.create($predicate);
+      my Rdf::Node $p = create-node($predicate);
       die "Node for $predicate is not created" unless $p.defined;
 
+      # Get object
+      #
       my Rdf::Node $o = $object ~~ Rdf::Rdf-tuple
         ?? $object.get-subject
-        !! Rdf::Node-builder.create($object);
+        !! create-node($object);
       die "Node for $object is not created" unless $o.defined;
 
       # Test for proper classes for the 3 items.
       #
-say "Subject test: ", $subject.isa('IRI') or $subject.isa('Blank');
-say "Predicate test: ", $predicate.isa('IRI');
-say "Subject test: ", $object.isa('IRI') or $object.isa('Blank')
-        or $object('Literal');
-#      if !$subject.isa('IRI'|'Blank') {
-      
-#      }
+      unless $s ~~ any(Rdf::IRI|Rdf::Blank)
+         and $p ~~ any(Rdf::IRI)
+         and $o ~~ any(Rdf::IRI|Rdf::Blank|Rdf::Literal) {
 
+        note "Tuple not filled according to rdf rules";
+      }
+
+      # Create and return new tuple
+      #
       return Rdf::Rdf-tuple.new( :subject($s), :predicate($p), :object($o));
+    }
+
+    # Create literal node if fully specified string is given
+    #
+    sub create-node (
+      Str $iri-string is copy where $iri-string.chars > 0
+      --> Rdf::Node
+    ) {
+
+      my Rdf::Node $node;
+
+      if $iri-string ~~ m/^ '_:' \w+/ {
+        $node = Rdf::Blank.new(:blank-node($iri-string));
+      }
+
+      # Check if iri is a full iri..
+      #
+      elsif $iri-string ~~ m/^ '<' /
+         or $iri-string ~~ m/ ':' /
+         or $iri-string ~~ m:s/^ 'a' $/ {
+        $node = Rdf::IRI.new(:iri($iri-string));
+      }
+
+      # The rest must be a literal
+      #
+      else {
+        $node = Rdf::Literal.new(:literal($iri-string));
+      }
+
+      return $node;
     }
 
     #---------------------------------------------------------------------------
