@@ -44,17 +44,17 @@ package Rdf {
     # (token ws is already declared by perl!!)
     #
     rule white-space { <.comment> }
-    rule comment { '#' <-[\n]>* }
+    token comment { '#' <-[\n]>* }
 
-    rule subject-item { ( <.resource> | <.blank-node> ) }
+    token subject-item { ( <.resource> | <.blank-node> ) }
 
     # Turtle predicate 'a' is same as rdf:type. This also means that predicate
     # rdf must be declared as http://www.w3.org/1999/02/22-rdf-syntax-ns#
     # in Rdf.pm6.
     #
-    rule predicate-item { <.resource> | 'a' }
+    token predicate-item { <.resource> | 'a' }
 
-    rule object-item { ( <.resource> | <.blank-node> | <.literal-text> ) }
+    token object-item { ( <.resource> | <.blank-node> | <.literal-text> ) }
 
     # '"' text '"'
     # '"""' long piece of text '"""'
