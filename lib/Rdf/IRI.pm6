@@ -24,8 +24,9 @@ package Rdf {
         my $r = $/<Rdf::Turtle::Grammar::resource>;
         my $uri = $r<uri-ref>:exists ?? ~$r<uri-ref> !! '';
         my $qnm = $r<qname>:exists ?? ~$r<qname> !! '';
-say "Iri: $uri, $qnm";
 
+        # Matched a uri-ref
+        #
         if ?$uri {
 
           # Prefix the base if the iri don't start with a protocol part
@@ -37,6 +38,8 @@ say "Iri: $uri, $qnm";
           self.set-short-value(self.short-iri(:full-iri($uri)));
         }
 
+        # Matched a qname
+        #
         elsif ?$qnm {
           self.set-value(self.full-iri(:short-iri($qnm)));
           self.set-short-value(self.short-iri(:full-iri($qnm)));

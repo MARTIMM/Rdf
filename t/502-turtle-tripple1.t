@@ -6,12 +6,13 @@ use Rdf::Turtle;
 use Rdf::Rdf-tuple;
 
 my Rdf::Turtle $t .= new;
-
+my Rdf::Rdf-tuple $rt;
 
 #-------------------------------------------------------------------------------
 subtest {
   my Str $content = qq:to/EOTURTLE/;
 
+  @base <http://502-turtle-tripple/> .
   <a1> <b1> <c1> .
 
   <a2> <b2> <c2> ;
@@ -27,6 +28,27 @@ subtest {
   ok $status ~~ Match, "Parse tuple ok";
 
   is get-tuple-count(), 7, "Number of 3-tuples found is {get-tuple-count()}";
+  $rt = get-tuple-from-index(2);
+  is $rt.subject.get-short-value(),
+     'http://502-turtle-tripple/a2',
+     "Subject: {$rt.subject.get-short-value()}";
+  is $rt.predicate.get-short-value(),
+     'http://502-turtle-tripple/b3',
+     "Subject: {$rt.predicate.get-short-value()}";
+  is $rt.object.get-short-value(),
+     'http://502-turtle-tripple/c3',
+     "Subject: {$rt.object.get-short-value()}";
+     
+  $rt = get-tuple-from-index(6);
+  is $rt.subject.get-short-value(),
+     'http://502-turtle-tripple/a4',
+     "Subject: {$rt.subject.get-short-value()}";
+  is $rt.predicate.get-short-value(),
+     'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
+     "Subject: {$rt.predicate.get-short-value()}";
+  is $rt.object.get-short-value(),
+     'http://502-turtle-tripple/c4b',
+     "Subject: {$rt.object.get-short-value()}";
 
 }, 'default relative triple';
 

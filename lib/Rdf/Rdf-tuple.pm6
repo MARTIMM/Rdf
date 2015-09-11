@@ -26,11 +26,7 @@ package Rdf {
 
     #---------------------------------------------------------------------------
     #
-    submethod BUILD (
-      :$subject,
-      :$predicate,
-      :$object
-    ) {
+    submethod BUILD ( :$subject, :$predicate, :$object ) {
       $!subject = $subject;
       $subject.save-tuple(self);
 
@@ -64,7 +60,8 @@ package Rdf {
       $object where $object ~~ any( Str, Rdf::Rdf-tuple)
       --> Rdf::Rdf-tuple
     ) is export {
-
+#say '=' x 80;
+#say "TT: $subject $predicate $object";
       # Get subject
       #
       my Rdf::Node $s = $subject ~~ Rdf::Rdf-tuple
@@ -94,6 +91,7 @@ package Rdf {
         note "Tuple not filled according to rdf rules";
       }
 
+#say "TT: ", $s.get-value, ', ', $p.get-value, ', ', $o.get-value;
       # Create and return new tuple
       #
       return Rdf::Rdf-tuple.new( :subject($s), :predicate($p), :object($o));
