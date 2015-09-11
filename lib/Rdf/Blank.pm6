@@ -6,12 +6,19 @@ package Rdf {
   #-----------------------------------------------------------------------------
   #
   class Blank is Rdf::Node {
+  
+    my Int $anonymous-count = 1;
 
     #---------------------------------------------------------------------------
     #
-    submethod BUILD ( :$blank-node is copy ) {
-      self.set-value($blank-node);
-      self.set-short-value($blank-node);
+    submethod BUILD ( Str :$blank is copy ) {
+      if $blank eq '[]' {
+        $blank = $anonymous-count.fmt('_:BN_%04d');
+        $anonymous-count++;
+      }
+
+      self.set-value($blank);
+      self.set-short-value($blank);
     }
   }
 }
