@@ -95,7 +95,7 @@ package Rdf {
 
     # '_:' local-name
     #
-    rule blank-node {
+    token blank-node {
         <node-id>
       | '[]'
       | '[' <predicate-object-list> ']'
@@ -115,7 +115,7 @@ package Rdf {
     #
     token resource { <uri-ref> | <qname> }
     token uri-ref { '<' ~ '>' <relative-uri> }
-    rule qname { <prefix-name>? ':' <name>? }
+    token qname { <prefix-name>? ':' <name>? }
 
     token language { <[a..z]>+ ( '-' <[a..z0..9]>+ )* }
 
@@ -138,7 +138,7 @@ package Rdf {
     token name { <.name_start_char> <.name-char>* }
     token prefix-name { <+ name_start_char - [_]> <.name-char>* }
     token relative-uri { <.u_character>* }
-    rule quoted-string { <.string> | <.long-string> }
+    token quoted-string { <.string> | <.long-string> }
     token string { '"' ~ '"' <.s_character>* }
     token long-string { '"""' ~ '"""' <.l_character>* }
 
