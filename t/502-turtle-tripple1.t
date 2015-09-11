@@ -3,10 +3,10 @@ use Test;
 
 use Rdf;
 use Rdf::Turtle;
-use Rdf::Rdf-tuple;
+use Rdf::Triple;
 
 my Rdf::Turtle $t .= new;
-my Rdf::Rdf-tuple $rt;
+my Rdf::Triple $rt;
 
 #-------------------------------------------------------------------------------
 subtest {
@@ -44,7 +44,7 @@ subtest {
      'http://502-turtle-tripple/a4',
      "Subject: {$rt.subject.get-short-value()}";
   is $rt.predicate.get-short-value(),
-     'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
+     'rdf:type',
      "Subject: {$rt.predicate.get-short-value()}";
   is $rt.object.get-short-value(),
      'http://502-turtle-tripple/c4b',

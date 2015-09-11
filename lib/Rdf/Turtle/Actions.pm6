@@ -1,6 +1,6 @@
 use v6;
 use Rdf;
-use Rdf::Rdf-tuple;            # Circular loading Rdf!
+use Rdf::Triple;            # Circular loading Rdf!
 
 package Rdf {
 

@@ -1,5 +1,8 @@
 use v6;
-#use Rdf;
+
+# Needed because of dependency on @prefixes defined in Rdf.pm6
+#
+use Rdf;
 
 package Rdf {
 
@@ -8,7 +11,7 @@ package Rdf {
     has Str $!value;
     has Str $!short-value;
     
-    # Array of Rdf::Rdf-Tuple
+    # Array of Rdf::Triple
     #
     has Array $tuples = [];
 
@@ -31,7 +34,7 @@ package Rdf {
     #---------------------------------------------------------------------------
     # Saved tuples which are pointing to this node
     #
-    method save-tuple ( $tuple where $tuple.isa('Rdf-tuple') ) {
+    method save-tuple ( $tuple where $tuple.isa('Triple') ) {
 
       $tuples.push($tuple);
     }
@@ -58,7 +61,6 @@ package Rdf {
       # second otherwise its the first.
       #
       ( my $prefix, my $local-name) = $short-iri.split(':');
-
       # prefix and localname if there is a ':'
       #
       my Str $full-iri;
