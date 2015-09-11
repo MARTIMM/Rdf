@@ -13,14 +13,13 @@
     "Rdf::Graph":               "lib/Rdf/Graph.pm6",
     "Rdf::IRI":                 "lib/Rdf/IRI.pm6",
     "Rdf::Literal":             "lib/Rdf/Literal.pm6",
-    "Rdf::Node-builder":        "lib/Rdf/Node-builder.pm6",
     "Rdf::Node":                "lib/Rdf/Node.pm6",
-    "Rdf::Rdf-tuple":           "lib/Rdf/Rdf-tuple.pm6",
-    
+    "Rdf::Triple":              "lib/Rdf/Triple.pm6",
+
     "Rdf::Turtle"               "lib/Rdf/Turtle.pm6",
     "Rdf::Turtle::Grammar"      "lib/Rdf/Turtle/Grammar.pm6",
     "Rdf::Turtle::Actions"      "lib/Rdf/Turtle/Actions.pm6"
   },
   "source-url": "git://github.com/MARTIMM/Rdf.git",
-  "version": "0.3.1"
+  "version": "0.3.2"
 }

@@ -69,6 +69,11 @@ That last thing would prove to be difficult, but we'll see.
 
 
 ## Changes
+* 0.3.2
+  * Grammar rdf 1.0 ok
+  * Rename of modules
+  * bugfixes
+  * more tests
 
 * 0.3.1
   * Grammar modifications. Remove verb and brought rules into <predicate-item>
