@@ -25,7 +25,7 @@ package Rdf {
       #
       $!language = '';
 
-say "Lit Q: ", $literal;
+#say "Lit Q: ", $literal;
       # Test literal with parts from the turtle grammar
       #
       if $literal ~~ m/ ^ <Rdf::Turtle::Grammar::literal-text> $ / {
@@ -83,7 +83,7 @@ say "Lit Q: ", $literal;
           $!lexical-form = $!datatype ~~ m/ 'double' /
                            ?? cleanup-double($lt)
                            !! $lt;
-say "DTS: ~$l<datatype-string>, $!lexical-form, $!datatype";
+#say "DTS: ~$l<datatype-string>, $!lexical-form, $!datatype";
 
           self!set-lv(:quotes('"'));
           self!set-sv(:quotes(''));

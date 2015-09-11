@@ -2,14 +2,21 @@ use v6;
 use Test;
 
 use Rdf;
-use Rdf::Node-builder;
+use Rdf::Blank;
+
+my Rdf::Blank $b;
 
 #-------------------------------------------------------------------------------
 subtest {
-  my Rdf::Blank $b1 = Rdf::Node-builder.create('_:x');
-  isa-ok $b1, 'Blank', 'l1 is Blank';
-  is ~$b1, '_:x', "Blank node 1 = $b1";
+  $b = Rdf::Blank.new(blank => '_:x');
+  isa-ok $b, 'Blank', 'B is Blank';
+  is ~$b, '_:x', "Blank node 1 = $b";
 
+  $b = Rdf::Blank.new(blank => '[]');
+  is ~$b, '_:BN_0001', "Anonymous blank node 1 = $b";
+
+  $b = Rdf::Blank.new(blank => '[]');
+  is ~$b, '_:BN_0002', "Anonymous blank node 1 = $b";
 }, 'Test blank node';
 
 #-------------------------------------------------------------------------------
