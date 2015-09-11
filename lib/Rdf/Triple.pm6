@@ -13,12 +13,12 @@ package Rdf {
   #-----------------------------------------------------------------------------
   # Triples or 3-tuples
   #
-#  my Rdf::Rdf-tuple @rdf-tuples;
-  my @rdf-tuples;
+#  my Rdf::Triple @Triples;
+  my @Triples;
 
   #-----------------------------------------------------------------------------
   #
-  class Rdf-tuple {
+  class Triple {
 
     has Rdf::Node $.subject;
     has Rdf::Node $.predicate;
@@ -46,7 +46,7 @@ package Rdf {
 
   #-----------------------------------------------------------------------------
   #
-  module Tuple-Tools {
+  module Triple-Tools {
 
     #---------------------------------------------------------------------------
     # Create a 3-tuple of a subject - predicate - object relationship. For each
@@ -55,16 +55,16 @@ package Rdf {
     # predicate or object.
     #
     sub tuple (
-      $subject where $subject ~~ any( Str, Rdf::Rdf-tuple),
-      Str $predicate is copy where $subject ~~ any( Str, Rdf::Rdf-tuple),
-      $object where $object ~~ any( Str, Rdf::Rdf-tuple)
-      --> Rdf::Rdf-tuple
+      $subject where $subject ~~ any( Str, Rdf::Triple),
+      Str $predicate is copy where $subject ~~ any( Str, Rdf::Triple),
+      $object where $object ~~ any( Str, Rdf::Triple)
+      --> Rdf::Triple
     ) is export {
 #say '=' x 80;
 #say "TT: $subject $predicate $object";
       # Get subject
       #
-      my Rdf::Node $s = $subject ~~ Rdf::Rdf-tuple
+      my Rdf::Node $s = $subject ~~ Rdf::Triple
         ?? $subject.get-subject
         !! create-node($subject);
 
@@ -77,7 +77,7 @@ package Rdf {
 
       # Get object
       #
-      my Rdf::Node $o = $object ~~ Rdf::Rdf-tuple
+      my Rdf::Node $o = $object ~~ Rdf::Triple
         ?? $object.get-subject
         !! create-node($object);
       die "Node for $object is not created" unless $o.defined;
@@ -94,9 +94,10 @@ package Rdf {
 #say "TT: ", $s.get-value, ', ', $p.get-value, ', ', $o.get-value;
       # Create and return new tuple
       #
-      return Rdf::Rdf-tuple.new( :subject($s), :predicate($p), :object($o));
+      return Rdf::Triple.new( :subject($s), :predicate($p), :object($o));
     }
 
+    #---------------------------------------------------------------------------
     # Create literal node if fully specified string is given
     #
     sub create-node (
@@ -106,8 +107,8 @@ package Rdf {
 
       my Rdf::Node $node;
 
-      if $iri-string ~~ m/^ '_:' \w+/ {
-        $node = Rdf::Blank.new(:blank-node($iri-string));
+      if $iri-string ~~ m/^ '_:' | '[]' / {
+        $node = Rdf::Blank.new(:blank($iri-string));
       }
 
       # Check if iri is a full iri..
@@ -130,29 +131,29 @@ package Rdf {
     #---------------------------------------------------------------------------
     #
     sub init-tuples ( ) is export {
-      @rdf-tuples = ();
+      @Triples = ();
     }
 
     #---------------------------------------------------------------------------
     #
     sub get-tuple-count ( --> Int ) is export {
-      return @rdf-tuples.elems;
+      return @Triples.elems;
     }
 
     #---------------------------------------------------------------------------
     #
     sub get-tuple-from-index (
-      $index where (0 <= $index < @rdf-tuples.elems)
-      --> Rdf::Rdf-tuple
+      $index where (0 <= $index < @Triples.elems)
+      --> Rdf::Triple
     ) is export {
-      return @rdf-tuples[$index];
+      return @Triples[$index];
     }
 
     #---------------------------------------------------------------------------
     #
     sub add-tuple ( Str $subject, Str $predicate, Str $object ) is export {
-      my Rdf::Rdf-tuple $t = tuple( $subject, $predicate, $object);
-      @rdf-tuples.push($t);
+      my Rdf::Triple $t = tuple( $subject, $predicate, $object);
+      @Triples.push($t);
     }
   }
 }
