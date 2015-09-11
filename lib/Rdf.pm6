@@ -95,14 +95,15 @@ say "Prefix & local name: '$prefix', '$local-name'";
       $cache-name ~~ s/ ^ 'http://' //;
       $cache-name ~~ s:g/ \/ /-/;
 
-      if ?$prefixes{$prefix} {
-        note "Prefix '$prefix' in use and mapped to $prefixes{$prefix}"
-          unless $prefixes{$prefix} eq $local-name;
-      }
-
-      else {
+# Prefixes are redefinable
+#      if ?$prefixes{$prefix} {
+#        note "Prefix '$prefix' in use and mapped to $prefixes{$prefix}"
+#          unless $prefixes{$prefix} eq $local-name;
+#      }
+#
+#      else {
         $prefixes{$prefix} = $local-name;
-      }
+#      }
 
       # Check protocol. If http:// then we can download the file and cache it
       # if there isn't a local version in the turtle home directory
