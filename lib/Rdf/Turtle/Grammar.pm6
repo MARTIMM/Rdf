@@ -52,7 +52,10 @@ package Rdf {
     # rdf must be declared as http://www.w3.org/1999/02/22-rdf-syntax-ns#
     # in Rdf.pm6.
     #
-    token predicate-item { <.resource> | 'a' }
+    token predicate-item {
+      [ <.resource> <?before \s> ] |
+      [ 'a' <?before \s> ]
+    }
 
     token object-item { ( <.resource> | <.blank-node> | <.literal-text> ) }
 
@@ -104,8 +107,9 @@ package Rdf {
 
     token node-id { '_:' <name> }
 
-    rule collection { '(' <item-list>? ')' }
-    rule item-list { <object-item>+ }
+    rule collection { '(' <object-item>* ')' }
+#    rule collection { '(' <item-list>? ')' }
+#    rule item-list { <object-item>+ }
 
     # '<' url '>'
     # prefix ':' local-name
