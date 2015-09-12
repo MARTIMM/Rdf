@@ -76,6 +76,7 @@ package Rdf {
         $!object = $o;
 
         $triples.push(self);
+        $!triples-idx = $triples.end;
       }
     }
 
@@ -101,6 +102,7 @@ package Rdf {
       }
 
       $triples.push(self);
+      $!triples-idx = $triples.end;
     }
 
     #---------------------------------------------------------------------------
@@ -112,7 +114,7 @@ package Rdf {
     #---------------------------------------------------------------------------
     #
     method init-triples ( ) {
-      $triples = ();
+      $triples = Array;
       $!subject = $!predicate = $!object = Rdf::Node;
       $!triples-idx = -1;
     }
