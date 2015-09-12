@@ -1,6 +1,6 @@
 use v6;
 use Rdf;
-use Rdf::Triple;            # Circular loading Rdf!
+use Rdf::Triple;
 
 package Rdf {
 
@@ -90,7 +90,7 @@ say "Object:      $match";
       $!object = ~$match;
 
 say "Add tuple: $!subject, $!predicate, $!object";
-      add-tuple( $!subject, $!predicate, $!object);
+      my Rdf::Triple $t .= new( :$!subject, :$!predicate, :$!object);
     }
   }
 }

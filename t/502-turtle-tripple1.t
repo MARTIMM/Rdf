@@ -5,8 +5,8 @@ use Rdf;
 use Rdf::Turtle;
 use Rdf::Triple;
 
-my Rdf::Turtle $t .= new;
-my Rdf::Triple $rt;
+my Rdf::Turtle $turtle .= new;
+my Rdf::Triple $t .= new;;
 
 #-------------------------------------------------------------------------------
 subtest {
@@ -24,31 +24,33 @@ subtest {
 
   EOTURTLE
 
-  my Match $status = $t.parse(:$content);
+  my Match $status = $turtle.parse(:$content);
   ok $status ~~ Match, "Parse tuple ok";
 
-  is get-tuple-count(), 7, "Number of 3-tuples found is {get-tuple-count()}";
-  $rt = get-tuple-from-index(2);
-  is $rt.subject.get-short-value(),
+  is $t.get-triple-count(),
+     7,
+     "Number of 3-tuples found is {$t.get-triple-count()}";
+  $t.get-triple-from-index(2);
+  is $t.subject.get-short-value(),
      'http://502-turtle-tripple/a2',
-     "Subject: {$rt.subject.get-short-value()}";
-  is $rt.predicate.get-short-value(),
+     "Subject: {$t.subject.get-short-value()}";
+  is $t.predicate.get-short-value(),
      'http://502-turtle-tripple/b3',
-     "Subject: {$rt.predicate.get-short-value()}";
-  is $rt.object.get-short-value(),
+     "Subject: {$t.predicate.get-short-value()}";
+  is $t.object.get-short-value(),
      'http://502-turtle-tripple/c3',
-     "Subject: {$rt.object.get-short-value()}";
+     "Subject: {$t.object.get-short-value()}";
      
-  $rt = get-tuple-from-index(6);
-  is $rt.subject.get-short-value(),
+  $t.get-triple-from-index(6);
+  is $t.subject.get-short-value(),
      'http://502-turtle-tripple/a4',
-     "Subject: {$rt.subject.get-short-value()}";
-  is $rt.predicate.get-short-value(),
+     "Subject: {$t.subject.get-short-value()}";
+  is $t.predicate.get-short-value(),
      'rdf:type',
-     "Subject: {$rt.predicate.get-short-value()}";
-  is $rt.object.get-short-value(),
+     "Subject: {$t.predicate.get-short-value()}";
+  is $t.object.get-short-value(),
      'http://502-turtle-tripple/c4b',
-     "Subject: {$rt.object.get-short-value()}";
+     "Subject: {$t.object.get-short-value()}";
 
 }, 'default relative triple';
 
@@ -70,7 +72,7 @@ subtest {
 
   EOTURTLE
 
-  my Match $status = $t.parse(:$content);
+  my Match $status = $turtle.parse(:$content);
   ok $status ~~ Match, "Parse tuple ok";
 
 }, 'simple triples';
@@ -87,7 +89,7 @@ subtest {
 
   EOTURTLE
 
-  my Match $status = $t.parse(:$content);
+  my Match $status = $turtle.parse(:$content);
   ok $status ~~ Match, "Parse tuple ok";
 
 }, 'triple with \';\'';
@@ -105,7 +107,7 @@ subtest {
 
   EOTURTLE
 
-  my Match $status = $t.parse(:$content);
+  my Match $status = $turtle.parse(:$content);
   ok $status ~~ Match, "Parse tuple ok";
 
 }, 'triple with \',\'';
@@ -125,7 +127,7 @@ subtest {
 
   EOTURTLE
 
-  my Match $status = $t.parse(:$content);
+  my Match $status = $turtle.parse(:$content);
   ok $status ~~ Match, "Parse tuple ok";
 
 }, 'triple with long text """';

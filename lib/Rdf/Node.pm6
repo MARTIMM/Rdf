@@ -11,10 +11,6 @@ package Rdf {
     has Str $!value;
     has Str $!short-value;
     
-    # Array of Rdf::Triple
-    #
-    has Array $tuples = [];
-
     #---------------------------------------------------------------------------
     #
     method set-value (
@@ -32,14 +28,6 @@ package Rdf {
     }
 
     #---------------------------------------------------------------------------
-    # Saved tuples which are pointing to this node
-    #
-    method save-tuple ( $tuple where $tuple.isa('Triple') ) {
-
-      $tuples.push($tuple);
-    }
-
-    #---------------------------------------------------------------------------
     #
     method get-value ( --> Str ) { return $!value; }
     method get-short-value ( --> Str ) { return $!short-value; }
@@ -49,12 +37,16 @@ package Rdf {
     # Convert short notation iri into full iri format
     # e.g. xsd:long --> http://www.w3.org/2001/XMLSchema#long
     #
-    method full-iri ( Str :$short-iri --> Str ) {
+    method full-iri ( Str :$short-iri where $short-iri.chars > 0 --> Str ) {
 
       # Return directly when '<' of the string, its already a full iri or a
       # wrong string altogether.
       #
-      return $short-iri if $short-iri ~~ m/^ '<' /;
+say "FI: ", $short-iri, ', ', self;
+      $short-iri ~~ m/^ '<' /; 
+      if $/ {
+        return $short-iri;
+      }
 
       # An iri can be a short iri of only the <local name> or a
       # <prefix:local name> combination. If split returns two results its the
@@ -87,7 +79,7 @@ package Rdf {
     #
     method short-iri ( Str :$full-iri --> Str ) is export {
 
-      my $short-iri = $full-iri;
+      my Str $short-iri = $full-iri;
       $short-iri ~~ s/^ '<' //;
       $short-iri ~~ s/ '>' $//;
 
