@@ -30,6 +30,7 @@ subtest {
   is $t.get-triple-count(),
      7,
      "Number of 3-tuples found is {$t.get-triple-count()}";
+
   $t.get-triple-from-index(2);
   is $t.subject.get-short-value(),
      'http://502-turtle-tripple/a2',
@@ -54,28 +55,48 @@ subtest {
 
 }, 'default relative triple';
 
-done();
-exit(0);
-
-=finish
-
 #-------------------------------------------------------------------------------
 subtest {
   my Str $content = qq:to/EOTURTLE/;
 
-  @prefix owl: <http://www.w3.org/2002/07/owl#> .
+  @base <http://502-turtle-tripple/> .
+  @prefix : <perl6#> .
+  @prefix a: <local#> .
 
-  <a1> <b1> <c1> .
-  <a2> <http://example.org/ns/b2> <c2> .
-
-  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  a  owl:Ontology .
+  <a1> a:b : .
+  :t <http://example.org/ns/b2> a: .
 
   EOTURTLE
 
+  # Init otherwise the number of triples will become 9 instead of two
+  #
+  $t.init-triples;
   my Match $status = $turtle.parse(:$content);
   ok $status ~~ Match, "Parse tuple ok";
 
-}, 'simple triples';
+  is $t.get-triple-count(),
+     2,
+     "Number of 3-tuples found is {$t.get-triple-count()}";
+
+  $t.get-triple-from-index(0);
+  is ~$t.predicate,
+     '<http://502-turtle-tripple/local#b>',
+     "Subject: {~$t.predicate}";
+  is ~$t.object,
+     '<http://502-turtle-tripple/perl6#>',
+     "Subject: {~$t.object}";
+
+  $t.get-triple-from-index(1);
+  is ~$t.subject,
+     '<http://502-turtle-tripple/perl6#t>',
+     "Subject: {~$t.subject}";
+
+}, 'prefix handling';
+
+done();
+exit(0);
+
+=finish
 
 #-------------------------------------------------------------------------------
 subtest {
