@@ -72,7 +72,7 @@ package Rdf {
     #---------------------------------------------------------------------------
     #
     method subject-item ( $match ) {
-say "Subject:     $match";
+say "\nSubject:     $match";
       $!subject = ~$match;
     }
 

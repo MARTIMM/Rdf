@@ -43,8 +43,8 @@ package Rdf {
     ) {
 
       if ?$subject and ?$predicate and ?$object {
-say '=' x 80;
-say "TT: $subject $predicate $object";
+#say '=' x 80;
+#say "TT: $subject $predicate $object";
 
         # Get subject
         #
@@ -70,7 +70,7 @@ say "TT: $subject $predicate $object";
           note "Tuple not filled according to rdf rules";
         }
 
-say "TT: ", $s.get-value, ', ', $p.get-value, ', ', $o.get-value;
+#say "TT: ", $s.get-value, ', ', $p.get-value, ', ', $o.get-value;
         $!subject = $s;
         $!predicate = $p;
         $!object = $o;

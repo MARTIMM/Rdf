@@ -10,7 +10,9 @@ package Rdf {
 
     has Str $!value;
     has Str $!short-value;
-    
+
+    my Regex $r = token { ^ '<' };
+
     #---------------------------------------------------------------------------
     #
     method set-value (
@@ -42,9 +44,12 @@ package Rdf {
       # Return directly when '<' of the string, its already a full iri or a
       # wrong string altogether.
       #
-say "FI: ", $short-iri, ', ', self;
-      $short-iri ~~ m/^ '<' /; 
-      if $/ {
+      # Previously the test `if $short-iri ~~ m/^ '<' / { ... }' was used which
+      # after a number of successful tests failed with the error;
+      #   Invocant requires a type object of type Match, but an object instance
+      #   was passed.  Did you forget a 'multi'?
+      #
+      if $short-iri ~~ $r {
         return $short-iri;
       }
 

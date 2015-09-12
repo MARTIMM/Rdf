@@ -6,7 +6,7 @@ use Rdf::Turtle;
 use Rdf::Triple;
 
 my Rdf::Turtle $turtle .= new;
-my Rdf::Triple $t .= new;;
+my Rdf::Triple $t .= new;
 
 #-------------------------------------------------------------------------------
 subtest {

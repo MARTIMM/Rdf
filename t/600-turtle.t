@@ -12,7 +12,7 @@ my Match $status = $t.parse-file(
 );
 
 ok $status.chunks.elems > 0,
-   "Parse 22-rdf-syntax-ns matched elements {$status.list.elems}";
+   "Parse 22-rdf-syntax-ns. Number of chunks in match {$status.chunks.elems}";
 
 #-------------------------------------------------------------------------------
 # Cleanup
