@@ -32,7 +32,11 @@ package Rdf {
       #
       $!grammar .= new;
       $!actions .= new;
-      return $!grammar.parse( $content, :actions($!actions)) // Match.new;
+      return $!grammar.parse(
+        $content,
+        :actions($!actions),
+        :rule('RDF_1_0')
+      ) // Match.new;
     }
   }
 }

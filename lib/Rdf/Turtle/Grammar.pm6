@@ -11,7 +11,7 @@ package Rdf {
 
     #---------------------------------------------------------------------------
     #
-    rule TOP { <statement>* }
+    rule RDF_1_0 { <statement>* }
     rule statement {
       <directive> '.' | <triples> '.' | <.white-space>
     }
