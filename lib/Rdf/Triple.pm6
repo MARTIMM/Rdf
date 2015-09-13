@@ -34,17 +34,14 @@ package Rdf {
     multi submethod BUILD ( ) { }
 
     #---------------------------------------------------------------------------
-    # Make triples based on strings
+    # Make triples based on strings. Arguments can be absent to return an
+    # empty object.
     #
-    multi submethod BUILD (
-      Str :$subject = '',
-      Str :$predicate = '',
-      Str :$object = ''
-    ) {
+    multi submethod BUILD ( Str :$subject, Str :$predicate, Str :$object ) {
 
-      if ?$subject and ?$predicate and ?$object {
 #say '=' x 80;
 #say "TT: $subject $predicate $object";
+      if ?$subject and ?$predicate and ?$object {
 
         # Get subject
         #
@@ -75,8 +72,8 @@ package Rdf {
         $!predicate = $p;
         $!object = $o;
 
-        $triples.push(self);
         $!triples-idx = $triples.end;
+        $triples.push(self);
       }
     }
 
@@ -101,8 +98,8 @@ package Rdf {
         note "Tuple not filled according to rdf rules";
       }
 
-      $triples.push(self);
       $!triples-idx = $triples.end;
+      $triples.push(self);
     }
 
     #---------------------------------------------------------------------------
@@ -117,6 +114,7 @@ package Rdf {
       $triples = Array;
       $!subject = $!predicate = $!object = Rdf::Node;
       $!triples-idx = -1;
+      init-blank-node-count();
     }
 
     #---------------------------------------------------------------------------

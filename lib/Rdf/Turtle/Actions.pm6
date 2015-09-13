@@ -1,6 +1,7 @@
 use v6;
 use Rdf;
 use Rdf::Triple;
+use Rdf::Blank;
 
 package Rdf {
 
@@ -15,6 +16,14 @@ package Rdf {
     has Str $.subject;
     has Str $.predicate;
     has Str $.object;
+
+    has Str $.bn-name;
+
+    constant $START-TRIPLE              = 0;
+    constant $SEEN-SUBJECT              = 1;
+    constant $SEEN-SUBJECT-BLANKNODE    = 2;
+    constant $SEEN-OBJECT-BLANKNODE     = 3;
+    my Int $triple-parse-phase          = $START-TRIPLE;
 
     #---------------------------------------------------------------------------
     #
@@ -66,7 +75,10 @@ package Rdf {
 
     #---------------------------------------------------------------------------
     #
-    method triples ( $match ) {
+    method start-triple ( $m ) { $triple-parse-phase = $START-TRIPLE; }
+    method seen-subject ( $m ) {
+      $triple-parse-phase = $SEEN-SUBJECT
+        unless $triple-parse-phase == $SEEN-SUBJECT-BLANKNODE;
     }
 
     #---------------------------------------------------------------------------
@@ -86,11 +98,44 @@ say "Predicate:   $match";
     #---------------------------------------------------------------------------
     #
     method object-item ( $match ) {
-say "Object:      $match";
+say "Object:      $match, phase: $triple-parse-phase";
+      my Rdf::Triple $t .= new;;
       $!object = ~$match;
 
+      if $triple-parse-phase == $SEEN-SUBJECT-BLANKNODE {
+say "Add tuple: $!bn-name, $!predicate, $!object";
+        $t .= new( :subject($!bn-name), :$!predicate, :$!object);
+      }
+
+      elsif $triple-parse-phase == $SEEN-SUBJECT {
 say "Add tuple: $!subject, $!predicate, $!object";
-      my Rdf::Triple $t .= new( :$!subject, :$!predicate, :$!object);
+        $t .= new( :$!subject, :$!predicate, :$!object);
+      }
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    method blank-node ( $match ) {
+say "Blank node:   $match";
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    method gen-blank-node ( $match ) {
+      my $bn = Rdf::Blank.new(blank => '[]');
+say "Gen blank node: phase: $triple-parse-phase";
+
+      if $triple-parse-phase == $START-TRIPLE {
+say "\nSubject:     $bn";
+        $!bn-name = $!subject = ~$bn;
+        $triple-parse-phase = $SEEN-SUBJECT-BLANKNODE;
+      }
+
+      else {
+say "Processing object";
+        $!bn-name = $!object = ~$bn;
+        $triple-parse-phase = $SEEN-OBJECT-BLANKNODE;
+      }
     }
   }
 }

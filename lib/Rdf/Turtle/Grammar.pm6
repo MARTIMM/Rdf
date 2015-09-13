@@ -29,7 +29,12 @@ package Rdf {
 
     # subject-item predicate object .
     #
-    rule triples { <subject-item> <predicate-object-list> }
+    rule triples {
+      <.start-triple> <subject-item> <.seen-subject> <predicate-object-list>
+    }
+    
+    token start-triple { <?> }
+    token seen-subject { <?> }
 
     rule predicate-object-list {
       <predicate-item> <object-list>
@@ -98,13 +103,14 @@ package Rdf {
 
     # '_:' local-name
     #
-    token blank-node {
-        <node-id>
-      | '[]'
-      | '[' <predicate-object-list> ']'
-      | <collection>
+    rule blank-node {
+      <node-id> |
+      '[]'      |
+      [ '[' <.gen-blank-node> <predicate-object-list> ']' ] |
+      <collection>
     }
-
+    
+    token gen-blank-node { <?> }
     token node-id { '_:' <name> }
 
     rule collection { '(' <object-item>* ')' }
