@@ -20,5 +20,9 @@ package Rdf {
       self.set-value($blank);
       self.set-short-value($blank);
     }
+    
+    sub init-blank-node-count ( ) is export {
+      $anonymous-count = 1;
+    }
   }
 }
