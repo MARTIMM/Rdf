@@ -15,7 +15,7 @@ subtest {
   is ?$status, True, "Raw parse empty text ok";
 
   $status = $grammar.parse( "# comment", :rule('comment'));
-  is ?$status, True, "Raw parse comment ok";
+  ok ?$status.orig(), "Raw parse comment ok";
 
 }, 'raw access';
 
@@ -27,11 +27,14 @@ subtest {
 
   spurt( 'xyz.ttl', $content );
 
+  # With empty files the statement key must be tested. This is a top rule
+  # which must be processed at least.
+  #
   my $status = $turtle.parse-file(:filename('xyz.ttl'));
-  is ?$status, True, "Empty file parse ok";
+  ok $status<statement>:exists, "Empty file parse ok";
 
   $status = $turtle.parse(:$content);
-  is ?$status, True, "Empty content parse ok";
+  ok $status<statement>:exists, "Empty content parse ok";
 
 }, 'empty turtle';
 
@@ -42,8 +45,7 @@ subtest {
   EOTURTLE
 
   my $status = $turtle.parse(:$content);
-#say $status.perl;
-  is ?$status, True, "Comments parse ok";
+  ok ?$status.orig(), "Comments parse ok";
 
 }, 'comment';
 

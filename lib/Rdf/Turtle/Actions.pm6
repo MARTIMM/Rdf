@@ -164,9 +164,9 @@ say "Seen blank node:   $match, phase: $triple-parse-phase, level: $bn-level";
         $triple-parse-phase = $SEEN-BLANKNODE;
       }
 
-      else {
-        note "In seen-blank-node: should not happen, phase $triple-parse-phase, level: $bn-level";
-      }
+#      else {
+#        note "In seen-blank-node: should not happen, phase $triple-parse-phase, level: $bn-level";
+#      }
 
       $bn-level--;
     }

@@ -25,7 +25,7 @@ subtest {
   EOTURTLE
 
   my Match $status = $turtle.parse(:$content);
-  ok $status ~~ Match, "Parse tuple ok";
+  ok ? $status.orig(), "Parse tuple ok";
 
   is $t.get-triple-count(),
      7,
@@ -72,7 +72,7 @@ subtest {
   #
   $t.init-triples;
   my Match $status = $turtle.parse(:$content);
-  ok $status ~~ Match, "Parse tuple ok";
+  ok $status.orig(), "Parse tuple ok";
 
   is $t.get-triple-count(),
      2,
@@ -111,7 +111,7 @@ subtest {
   EOTURTLE
 
   my Match $status = $turtle.parse(:$content);
-  ok $status ~~ Match, "Parse tuple ok";
+  ok $status.orig(), "Parse tuple ok";
 
 }, 'triple with \';\'';
 
@@ -129,7 +129,7 @@ subtest {
   EOTURTLE
 
   my Match $status = $turtle.parse(:$content);
-  ok $status ~~ Match, "Parse tuple ok";
+  ok $status.orig(), "Parse tuple ok";
 
 }, 'triple with \',\'';
 
@@ -149,7 +149,7 @@ subtest {
   EOTURTLE
 
   my Match $status = $turtle.parse(:$content);
-  ok $status ~~ Match, "Parse tuple ok";
+  ok $status.orig(), "Parse tuple ok";
 
 }, 'triple with long text """';
 

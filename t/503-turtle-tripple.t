@@ -25,7 +25,7 @@ subtest {
 
   $t.init-triples;
   my Match $status = $turtle.parse(:$content);
-  ok $status ~~ Match, "Parse tuple ok";
+  ok $status.orig(), "Parse tuple ok";
 
   test-triples( 1, $t, $short-names);
 
@@ -51,7 +51,7 @@ subtest {
 
   $t.init-triples;
   my Match $status = $turtle.parse(:$content);
-  ok $status ~~ Match, "Parse tuple ok";
+  ok $status.orig(), "Parse tuple ok";
 
   test-triples( 3, $t, $short-names);
 
@@ -77,7 +77,7 @@ subtest {
 
   $t.init-triples;
   my Match $status = $turtle.parse(:$content);
-  ok $status ~~ Match, "Parse tuple ok";
+  ok $status.orig(), "Parse tuple ok";
 
   test-triples( 3, $t, $short-names);
 
@@ -111,7 +111,7 @@ subtest {
   
   $t.init-triples;
   my Match $status = $turtle.parse(:$content);
-  ok $status ~~ Match, "Parse tuple ok";
+  ok $status.orig(), "Parse tuple ok";
 
   test-triples( 4, $t, $short-names);
 
@@ -140,7 +140,7 @@ subtest {
   
   $t.init-triples;
   my Match $status = $turtle.parse(:$content);
-  ok $status ~~ Match, "Parse tuple ok";
+  ok $status.orig(), "Parse tuple ok";
 
   test-triples( 4, $t, $short-names);
 
@@ -174,7 +174,7 @@ subtest {
 
   $t.init-triples;
   my Match $status = $turtle.parse(:$content);
-  ok $status ~~ Match, "Parse tuple ok";
+  ok $status.orig(), "Parse tuple ok";
 
   test-triples( 7, $t, $short-names);
 

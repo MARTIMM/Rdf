@@ -25,6 +25,9 @@ package Rdf {
     }
 
     #-----------------------------------------------------------------------------
+    # Parse content and return a Match object always. When parsing fails,
+    # the Match object is empty. Test for failure like '? $m<statement>:exists'.
+    # The rule statement is noted in the Match object.
     #
     method parse ( :$content is copy --> Match ) {
 
@@ -33,10 +36,10 @@ package Rdf {
       $!grammar .= new;
       $!actions .= new;
       return $!grammar.parse(
-        $content,
-        :actions($!actions),
-        :rule('RDF_1_0')
-      ) // Match.new;
+               $content,
+               :actions($!actions),
+               :rule('RDF_1_0')
+             ) // Match.new;
     }
   }
 }
