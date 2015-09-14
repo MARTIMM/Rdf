@@ -21,5 +21,5 @@
     "Rdf::Turtle::Actions"      "lib/Rdf/Turtle/Actions.pm6"
   },
   "source-url": "git://github.com/MARTIMM/Rdf.git",
-  "version": "0.3.2"
+  "version": "0.3.3"
 }

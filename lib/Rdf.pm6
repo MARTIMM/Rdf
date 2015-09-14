@@ -3,7 +3,7 @@ use File::HomeDir;
 use HTTP::UserAgent;
 #use Rdf::Turtle;               # Circular loading Rdf!
 
-package Rdf:ver<0.3.2>:auth<https://github.com/MARTIMM> {
+package Rdf:ver<0.3.3>:auth<https://github.com/MARTIMM> {
 
   #-----------------------------------------------------------------------------
   # Setup program-name. Path leading to the name of the program is removed.
@@ -87,8 +87,6 @@ if 0 { # Not yet useful
       Str :$local-name where $local-name.chars >= 1
     ) is export {
 
-say "Prefix & local name: '$prefix', '$local-name'";
-
       # Make a local cache name from url
       #
       my $cache-name = $local-name;
@@ -114,7 +112,6 @@ say "Prefix & local name: '$prefix', '$local-name'";
         # Cache data into local files
         #
         my HTTP::UserAgent $ua .= new;
-say "Get source of $local-name";
         my $response = $ua.get($local-name);
         if $response.is-success {
           my $content = $response.content;
@@ -127,8 +124,7 @@ say "Get source of $local-name";
 
         CATCH {
           default {
-            say .message ~ ". Command to get " ~ $local-name;
-#            .say;
+#            say .message ~ ". Command to get " ~ $local-name;
           }
         }
       }
@@ -166,7 +162,6 @@ say "Get source of $local-name";
     #
     sub set-base ( Str $new-base ) is export {
       $base = $new-base;
-say "Set base to $base";
     }
   }
 }

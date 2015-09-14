@@ -37,10 +37,12 @@ package Rdf {
     # Make triples based on strings. Arguments can be absent to return an
     # empty object.
     #
-    multi submethod BUILD ( Str :$subject, Str :$predicate, Str :$object ) {
+    multi submethod BUILD (
+      Str :$subject = '', Str :$predicate = '', Str :$object = ''
+    ) {
 
-#say '=' x 80;
-#say "TT: $subject $predicate $object";
+say '=' x 80;
+say "TT: $subject $predicate $object";
       if ?$subject and ?$predicate and ?$object {
 
         # Get subject
@@ -67,7 +69,7 @@ package Rdf {
           note "Tuple not filled according to rdf rules";
         }
 
-#say "TT: ", $s.get-value, ', ', $p.get-value, ', ', $o.get-value;
+say "TT: ", $s.get-value, ', ', $p.get-value, ', ', $o.get-value;
         $!subject = $s;
         $!predicate = $p;
         $!object = $o;

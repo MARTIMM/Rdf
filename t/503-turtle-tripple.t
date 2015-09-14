@@ -9,7 +9,6 @@ my Rdf::Turtle $turtle .= new;
 my Rdf::Triple $t .= new;
 
 #-------------------------------------------------------------------------------
-if 0 {
 subtest {
   my Str $content = qq:to/EOTURTLE/;
 
@@ -20,21 +19,18 @@ subtest {
 
   EOTURTLE
 
+  my Array $short-names = [
+    [<_:BN_0001 http://503-turtle-tripple/b1 http://503-turtle-tripple/c1>],
+  ];
+
   $t.init-triples;
   my Match $status = $turtle.parse(:$content);
   ok $status ~~ Match, "Parse tuple ok";
 
-  is $t.get-triple-count(),
-     1,
-     "Number of 3-tuples found is {$t.get-triple-count()}";
-
-  $t.get-triple-from-index(0);
-  is $t.subject.get-short-value(),
-     '_:BN_0001',
-     "Subject: {$t.subject.get-short-value()}";
+  test-triples( 1, $t, $short-names);
 
 }, 'simple blank node in triples';
-}
+
 #-------------------------------------------------------------------------------
 subtest {
   my Str $content = qq:to/EOTURTLE/;
@@ -47,116 +43,181 @@ subtest {
 
   EOTURTLE
 
+  my Array $short-names = [
+    [<_:BN_0001         rdf:type        foaf:Person>],
+    [<_:BN_0001         foaf:name       "Alice">],
+    [<_:BN_0001         foaf:knows      _:b>],
+  ];
+
   $t.init-triples;
   my Match $status = $turtle.parse(:$content);
   ok $status ~~ Match, "Parse tuple ok";
 
+  test-triples( 3, $t, $short-names);
+
+}, 'complex blank nodes on subject';
+
+#-------------------------------------------------------------------------------
+subtest {
+  my Str $content = qq:to/EOTURTLE/;
+
+  @base <http://503-turtle-tripple/> .
+  @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+  @prefix : <perl6#> .
+
+  _:a foaf:knows [ a foaf:Person ; foaf:name "Alice" ] .
+
+  EOTURTLE
+
+  my Array $short-names = [
+    [<_:BN_0001         rdf:type        foaf:Person>],
+    [<_:BN_0001         foaf:name       "Alice">],
+    [<_:a               foaf:knows      _:BN_0001>],
+  ];
+
+  $t.init-triples;
+  my Match $status = $turtle.parse(:$content);
+  ok $status ~~ Match, "Parse tuple ok";
+
+  test-triples( 3, $t, $short-names);
+
+}, 'complex blank nodes on object';
+
+#-------------------------------------------------------------------------------
+subtest {
+  my Str $content = qq:to/EOTURTLE/;
+
+  @base <http://503-turtle-tripple/> .
+  @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+  @prefix : <perl6#> .
+
+  # _:BN_0001   foaf:name       "Tom" .
+  # _:BN_0002   foaf:name       "Mary" .
+  # _:BN_0001   foaf:knows      _:BN_0002 .
+  # _:BN_0001   foaf:knows      _:a .
+  #
+  [ foaf:name "Tom";
+    foaf:knows [ foaf:name "Mary" ]
+  ] foaf:knows _:a .
+
+  EOTURTLE
+
+  my Array $short-names = [
+    [<_:BN_0001   foaf:name       "Tom">],
+    [<_:BN_0002   foaf:name       "Mary">],
+    [<_:BN_0001   foaf:knows      _:BN_0002>],
+    [<_:BN_0001   foaf:knows      _:a>],
+  ];
+  
+  $t.init-triples;
+  my Match $status = $turtle.parse(:$content);
+  ok $status ~~ Match, "Parse tuple ok";
+
+  test-triples( 4, $t, $short-names);
+
+}, 'nested blank nodes on subject';
+
+#-------------------------------------------------------------------------------
+subtest {
+  my Str $content = qq:to/EOTURTLE/;
+
+  @base <http://503-turtle-tripple/> .
+  @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+  @prefix : <perl6#> .
+
+  _:x foaf:knows [ foaf:name "Tom";
+                   foaf:knows [ foaf:name "Mary" ]
+                 ] .
+
+  EOTURTLE
+
+  my Array $short-names = [
+    [<_:BN_0001   foaf:name       "Tom">],
+    [<_:BN_0002   foaf:name       "Mary">],
+    [<_:BN_0001   foaf:knows      _:BN_0002>],
+    [<_:x         foaf:knows      _:BN_0001>],
+  ];
+  
+  $t.init-triples;
+  my Match $status = $turtle.parse(:$content);
+  ok $status ~~ Match, "Parse tuple ok";
+
+  test-triples( 4, $t, $short-names);
+
+}, 'nested blank nodes on object';
+
+#-------------------------------------------------------------------------------
+subtest {
+  my Str $content = qq:to/EOTURTLE/;
+
+  @base <http://503-turtle-tripple/> .
+  @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+  @prefix : <perl6#> .
+
+  [ foaf:name "Chris" ;
+    foaf:knows [ foaf:name "Mary" ]
+  ] foaf:knows [ foaf:name "Tom";
+                 foaf:knows [ foaf:name "Mary" ]
+               ] .
+
+  EOTURTLE
+
+  my Array $short-names = [
+    [<_:BN_0001   foaf:name       "Chris">],
+    [<_:BN_0002   foaf:name       "Mary">],
+    [<_:BN_0001   foaf:knows      _:BN_0002>],
+    [<_:BN_0003   foaf:name       "Tom">],
+    [<_:BN_0004   foaf:name       "Mary">],
+    [<_:BN_0003   foaf:knows      _:BN_0004>],
+    [<_:BN_0001   foaf:knows      _:BN_0003>],
+  ];
+
+  $t.init-triples;
+  my Match $status = $turtle.parse(:$content);
+  ok $status ~~ Match, "Parse tuple ok";
+
+  test-triples( 7, $t, $short-names);
+
+}, 'nested blank nodes on subject and object';
+
+
+#-------------------------------------------------------------------------------
+# Test triples
+#
+sub test-triples ( Int $n-triples, Rdf::Triple $t, Array $short-names ) {
+
   is $t.get-triple-count(),
-     3,
+     $n-triples,
      "Number of 3-tuples found is {$t.get-triple-count()}";
 
-  for ^3 -> $idx {
+  for ^ $t.get-triple-count() -> $idx {
     $t.get-triple-from-index($idx);
-    is ~$t.subject, '_:BN_0001', "Subject: {~$t.subject}";
+
+    is $t.subject.get-short-value(),
+       $short-names[$idx][0],
+       "Subject: {~$t.subject}";
+
+    is $t.predicate.get-short-value(),
+       $short-names[$idx][1],
+       "Predicate: {~$t.predicate}";
+
+    is $t.object.get-short-value(),
+       $short-names[$idx][2],
+       "Object: {~$t.object}";
   }
-
-}, 'complex blank nodes';
-
-done();
-exit(0);
-
-=finish
-
-  is $t.get-triple-count(),
-     1,
-     "Number of 3-tuples found is {$t.get-triple-count()}";
-
-  $t.get-triple-from-index(0);
-  is $t.subject.get-short-value(),
-     'http://502-turtle-tripple/a2',
-     "Subject: {$t.subject.get-short-value()}";
-  is $t.predicate.get-short-value(),
-     'http://502-turtle-tripple/b3',
-     "Subject: {$t.predicate.get-short-value()}";
-  is $t.object.get-short-value(),
-     'http://502-turtle-tripple/c3',
-     "Subject: {$t.object.get-short-value()}";
-
-#-------------------------------------------------------------------------------
-subtest {
-  my Str $content = qq:to/EOTURTLE/;
-
-  @prefix owl: <http://www.w3.org/2002/07/owl#> .
-
-  <a1> <b1> <c1> .
-  <a2> <http://example.org/ns/b2> <c2> .
-
-  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  a  owl:Ontology .
-
-  EOTURTLE
-
-  my Match $status = $turtle.parse(:$content);
-  ok $status ~~ Match, "Parse tuple ok";
-
-}, 'simple triples';
-
-#-------------------------------------------------------------------------------
-subtest {
-  my Str $content = qq:to/EOTURTLE/;
-
-  @prefix owl: <http://www.w3.org/2002/07/owl#> .
-
-  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  a  owl:Ontology ;
-	dc:title "The RDF Concepts Vocabulary (RDF)" ;
-	dc:description "This is the RDF Schema for the RDF vocabulary terms in the RDF Namespace, defined in RDF 1.1 Concepts." .
-
-  EOTURTLE
-
-  my Match $status = $turtle.parse(:$content);
-  ok $status ~~ Match, "Parse tuple ok";
-
-}, 'triple with \';\'';
-
-#-------------------------------------------------------------------------------
-subtest {
-  my Str $content = qq:to/EOTURTLE/;
-
-  @prefix owl: <http://www.w3.org/2002/07/owl#> .
-
-  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  a  owl:Ontology ,
-                                                    <test-case>;
-	dc:title "The RDF Concepts Vocabulary (RDF)" ;
-	dc:description "This is the RDF Schema for the RDF vocabulary terms in the RDF Namespace, defined in RDF 1.1 Concepts." .
-
-  EOTURTLE
-
-  my Match $status = $turtle.parse(:$content);
-  ok $status ~~ Match, "Parse tuple ok";
-
-}, 'triple with \',\'';
-
-#-------------------------------------------------------------------------------
-subtest {
-  my Str $content = qq:to/EOTURTLE/;
-
-  @prefix owl: <http://www.w3.org/2002/07/owl#> .
-
-  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  a  owl:Ontology ,
-                                                    <test-case>;
-	dc:title "The RDF Concepts Vocabulary (RDF)" ;
-	dc:description
-          """This is the RDF Schema for the RDF vocabulary terms in the RDF
-          Namespace, defined in RDF 1.1 Concepts.""" .
-
-  EOTURTLE
-
-  my Match $status = $turtle.parse(:$content);
-  ok $status ~~ Match, "Parse tuple ok";
-
-}, 'triple with long text """';
+}
 
 #-------------------------------------------------------------------------------
 # Cleanup
 #
 done();
 exit(0);
+
+=finish
+
+  my Array $short-names = [
+    [<>],
+    [<>],
+    [<>],
+    [<>],
+  ];

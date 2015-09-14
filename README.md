@@ -69,6 +69,8 @@ That last thing would prove to be difficult, but we'll see.
 
 
 ## Changes
+* 0.3.3
+  * Tests of nested blank nodes
 * 0.3.2
   * Grammar rdf 1.0 ok
   * Rename of modules
