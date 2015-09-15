@@ -22,6 +22,7 @@ package Rdf {
 #    constant $SEEN-SUBJECT-BLANKNODE    = 4;
 #    constant $SEEN-OBJECT-BLANKNODE     = 5;
     constant $SEEN-BLANKNODE            = 6;
+    constant $PROC-COLLECTION           = 7;
     my Int $triple-parse-phase          = $START-TRIPLE;
 
 #    #---------------------------------------------------------------------------
@@ -131,16 +132,23 @@ say "Triple count: {$t.get-triple-count()}";
 
     #---------------------------------------------------------------------------
     #
-    method gen-blank-node ( $match ) {
+    method proc-blank-node ( $match ) {
       my $bn = Rdf::Blank.new(blank => '[]');
-say "Gen blank node: phase: $triple-parse-phase, level: $bn-level";
+say "Proc blank node: phase: $triple-parse-phase, level: $bn-level";
 
+      # When blank node group is found at the start of the triple, it is
+      # positioned in place of a subject. All other nested groups of blank node
+      # predicate-object lists are on the object.
+      #
       if $triple-parse-phase == $START-TRIPLE {
 #say "\nSubject\[GBN]:     $bn";
         $trs[$bn-level]<subject> = ~$bn;
         $triple-parse-phase = $PROC-SUBJECT-BLANKNODE;
       }
 
+      # When blank node group is not found at the start of the triple, it is
+      # positioned in place of an object.
+      #
       else {
 #say "Object\[GBN]:     $bn";
         $trs[$bn-level]<object> = ~$bn;
@@ -169,6 +177,20 @@ say "Seen blank node:   $match, phase: $triple-parse-phase, level: $bn-level";
 #      }
 
       $bn-level--;
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    method collection ( $match ) {
+say "Seen collection:   $match, phase: $triple-parse-phase, level: $bn-level";
+      
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    method proc-collection ( $match ) {
+say "Seen collection:   $match, phase: $triple-parse-phase, level: $bn-level";
+      $triple-parse-phase = $PROC-COLLECTION;
     }
   }
 }

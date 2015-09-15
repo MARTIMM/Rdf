@@ -106,15 +106,16 @@ package Rdf {
     rule blank-node {
       <node-id> |
       '[]'      |
-      [ '[' <.gen-blank-node> <predicate-object-list> ']' <.seen-blank-node> ] |
+      [ '[' <.proc-blank-node> <predicate-object-list> ']' <.seen-blank-node> ] |
       <collection>
     }
     
-    token gen-blank-node { <?> }
+    token proc-blank-node { <?> }
     token seen-blank-node { <?> }
     token node-id { '_:' <name> }
 
-    rule collection { '(' <object-item>* ')' }
+    rule collection { '(' <.proc-collection> <object-item>* ')' }
+    token proc-collection { <?> }
 #    rule collection { '(' <item-list>? ')' }
 #    rule item-list { <object-item>+ }
 
