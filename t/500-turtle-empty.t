@@ -53,5 +53,5 @@ subtest {
 # Cleanup
 #
 unlink 'xyz.ttl';
-done();
+done-testing();
 exit(0);
