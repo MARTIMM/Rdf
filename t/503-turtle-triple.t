@@ -8,6 +8,7 @@ use Rdf::Triple;
 my Rdf::Turtle $turtle .= new;
 my Rdf::Triple $t .= new;
 
+#`{{
 #-------------------------------------------------------------------------------
 subtest {
   my Str $content = qq:to/EOTURTLE/;
@@ -15,7 +16,30 @@ subtest {
   @base <http://503-turtle-tripple/> .
   @prefix : <perl6#> .
 
-  (:a :b) <b1> <c1> .
+  _:MY_BN <b1> <c1> .
+
+  EOTURTLE
+
+  my Array $short-names = [
+    [<_:MY_BN http://503-turtle-tripple/b1 http://503-turtle-tripple/c1>],
+  ];
+
+  $t.init-triples;
+  my Match $status = $turtle.parse(:$content);
+  ok $status.orig(), "Parse tuple ok";
+
+  test-triples( 1, $t, $short-names);
+
+}, 'named blank node in triples';
+
+#-------------------------------------------------------------------------------
+subtest {
+  my Str $content = qq:to/EOTURTLE/;
+
+  @base <http://503-turtle-tripple/> .
+  @prefix : <perl6#> .
+
+  [] <b1> <c1> .
 
   EOTURTLE
 
@@ -29,11 +53,8 @@ subtest {
 
   test-triples( 1, $t, $short-names);
 
-}, 'simple blank node in triples';
-
-
-done();
-exit(0);
+}, 'anonymous blank node in triples';
+}}
 
 #-------------------------------------------------------------------------------
 subtest {
@@ -43,7 +64,7 @@ subtest {
   @prefix foaf: <http://xmlns.com/foaf/0.1/> .
   @prefix : <perl6#> .
 
-  [ a foaf:Person ; foaf:name "Alice" ] foaf:knows _:b .
+  [ a foaf:Person ; foaf:name "Alice" ] foaf:knows _:b , _:c .
 
   EOTURTLE
 
@@ -51,15 +72,19 @@ subtest {
     [<_:BN_0001         rdf:type        foaf:Person>],
     [<_:BN_0001         foaf:name       "Alice">],
     [<_:BN_0001         foaf:knows      _:b>],
+    [<_:BN_0001         foaf:knows      _:c>],
   ];
 
   $t.init-triples;
   my Match $status = $turtle.parse(:$content);
   ok $status.orig(), "Parse tuple ok";
 
-  test-triples( 3, $t, $short-names);
+  test-triples( 4, $t, $short-names);
 
-}, 'complex blank nodes on subject';
+}, 'complex anonymous blank nodes on subject';
+
+done-testing();
+exit(0);
 
 #-------------------------------------------------------------------------------
 subtest {
@@ -85,7 +110,7 @@ subtest {
 
   test-triples( 3, $t, $short-names);
 
-}, 'complex blank nodes on object';
+}, 'complex anonymous blank nodes on object';
 
 #-------------------------------------------------------------------------------
 subtest {
@@ -214,7 +239,7 @@ sub test-triples ( Int $n-triples, Rdf::Triple $t, Array $short-names ) {
 #-------------------------------------------------------------------------------
 # Cleanup
 #
-done();
+done-testing();
 exit(0);
 
 =finish

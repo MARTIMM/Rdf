@@ -15,7 +15,7 @@ subtest {
   @base <http://503-turtle-tripple/> .
   @prefix : <perl6#> .
 
-  [] <b1> <c1> .
+  (:a :b) <b1> <c1> .
 
   EOTURTLE
 
@@ -30,6 +30,10 @@ subtest {
   test-triples( 1, $t, $short-names);
 
 }, 'simple blank node in triples';
+
+
+done();
+exit(0);
 
 #-------------------------------------------------------------------------------
 subtest {
@@ -210,7 +214,7 @@ sub test-triples ( Int $n-triples, Rdf::Triple $t, Array $short-names ) {
 #-------------------------------------------------------------------------------
 # Cleanup
 #
-done();
+done-testing();
 exit(0);
 
 =finish

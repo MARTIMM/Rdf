@@ -41,8 +41,8 @@ subtest {
   is $t.object.get-short-value(),
      'http://502-turtle-tripple/c3',
      "Subject: {$t.object.get-short-value()}";
-     
-  $t.get-triple-from-index(6);
+
+  $t .= new(:index(6));
   is $t.subject.get-short-value(),
      'http://502-turtle-tripple/a4',
      "Subject: {$t.subject.get-short-value()}";
@@ -86,14 +86,14 @@ subtest {
      '<http://502-turtle-tripple/perl6#>',
      "Subject: {~$t.object}";
 
-  $t.get-triple-from-index(1);
+  $t .= new: :index(1);
   is ~$t.subject,
      '<http://502-turtle-tripple/perl6#t>',
      "Subject: {~$t.subject}";
 
 }, 'prefix handling';
 
-done();
+done-testing();
 exit(0);
 
 =finish
@@ -156,5 +156,5 @@ subtest {
 #-------------------------------------------------------------------------------
 # Cleanup
 #
-done();
+done-testing();
 exit(0);
