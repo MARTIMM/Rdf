@@ -32,7 +32,7 @@ subtest {
 }, 'simple blank node in triples';
 
 
-done();
+done-testing();
 exit(0);
 
 #-------------------------------------------------------------------------------
