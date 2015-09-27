@@ -8,6 +8,7 @@ use Rdf::Triple;
 my Rdf::Turtle $turtle .= new;
 my Rdf::Triple $t .= new;
 
+#`{{
 #-------------------------------------------------------------------------------
 subtest {
   my Str $content = qq:to/EOTURTLE/;
@@ -37,10 +38,10 @@ subtest {
      "Subject: {$t.subject.get-short-value()}";
   is $t.predicate.get-short-value(),
      'http://502-turtle-tripple/b3',
-     "Subject: {$t.predicate.get-short-value()}";
+     "Predicate: {$t.predicate.get-short-value()}";
   is $t.object.get-short-value(),
      'http://502-turtle-tripple/c3',
-     "Subject: {$t.object.get-short-value()}";
+     "Object: {$t.object.get-short-value()}";
 
   $t .= new(:index(6));
   is $t.subject.get-short-value(),
@@ -48,10 +49,10 @@ subtest {
      "Subject: {$t.subject.get-short-value()}";
   is $t.predicate.get-short-value(),
      'rdf:type',
-     "Subject: {$t.predicate.get-short-value()}";
+     "Predicate: {$t.predicate.get-short-value()}";
   is $t.object.get-short-value(),
      'http://502-turtle-tripple/c4b',
-     "Subject: {$t.object.get-short-value()}";
+     "Object: {$t.object.get-short-value()}";
 
 }, 'default relative triple';
 
@@ -81,10 +82,10 @@ subtest {
   $t.get-triple-from-index(0);
   is ~$t.predicate,
      '<http://502-turtle-tripple/local#b>',
-     "Subject: {~$t.predicate}";
+     "Predicate: {~$t.predicate}";
   is ~$t.object,
      '<http://502-turtle-tripple/perl6#>',
-     "Subject: {~$t.object}";
+     "Object: {~$t.object}";
 
   $t .= new: :index(1);
   is ~$t.subject,
@@ -92,28 +93,7 @@ subtest {
      "Subject: {~$t.subject}";
 
 }, 'prefix handling';
-
-done-testing();
-exit(0);
-
-=finish
-
-#-------------------------------------------------------------------------------
-subtest {
-  my Str $content = qq:to/EOTURTLE/;
-
-  @prefix owl: <http://www.w3.org/2002/07/owl#> .
-
-  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  a  owl:Ontology ;
-	dc:title "The RDF Concepts Vocabulary (RDF)" ;
-	dc:description "This is the RDF Schema for the RDF vocabulary terms in the RDF Namespace, defined in RDF 1.1 Concepts." .
-
-  EOTURTLE
-
-  my Match $status = $turtle.parse(:$content);
-  ok $status.orig(), "Parse tuple ok";
-
-}, 'triple with \';\'';
+}}
 
 #-------------------------------------------------------------------------------
 subtest {
@@ -122,25 +102,7 @@ subtest {
   @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  a  owl:Ontology ,
-                                                    <test-case>;
-	dc:title "The RDF Concepts Vocabulary (RDF)" ;
-	dc:description "This is the RDF Schema for the RDF vocabulary terms in the RDF Namespace, defined in RDF 1.1 Concepts." .
-
-  EOTURTLE
-
-  my Match $status = $turtle.parse(:$content);
-  ok $status.orig(), "Parse tuple ok";
-
-}, 'triple with \',\'';
-
-#-------------------------------------------------------------------------------
-subtest {
-  my Str $content = qq:to/EOTURTLE/;
-
-  @prefix owl: <http://www.w3.org/2002/07/owl#> .
-
-  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  a  owl:Ontology ,
-                                                    <test-case>;
+                                                    <test-case> ;
 	dc:title "The RDF Concepts Vocabulary (RDF)" ;
 	dc:description
           """This is the RDF Schema for the RDF vocabulary terms in the RDF
@@ -148,10 +110,22 @@ subtest {
 
   EOTURTLE
 
+  # Init otherwise the number of triples will become 9 instead of two
+  #
+  $t.init-triples;
   my Match $status = $turtle.parse(:$content);
   ok $status.orig(), "Parse tuple ok";
 
-}, 'triple with long text """';
+  is $t.get-triple-count(),
+     4,
+     "Number of 3-tuples found is {$t.get-triple-count()}";
+
+  $t .= new: :index(3);
+  is ~$t.object,
+     qq@"""This is the RDF Schema for the RDF vocabulary terms in the RDF\n        Namespace, defined in RDF 1.1 Concepts."""^^<http://www.w3.org/2001/XMLSchema#string>@,
+     "Object: {~$t.object}";
+
+}, 'triple with short " and long text """';
 
 #-------------------------------------------------------------------------------
 # Cleanup

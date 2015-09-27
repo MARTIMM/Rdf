@@ -80,7 +80,31 @@ subtest {
 }, 'literal string';
 
 #-------------------------------------------------------------------------------
+subtest {
+  $lit .= new(:literal('"""abcdef
+  lkjfgdlkjd lkjdflkj"""'));
+  ok $lit.isa('Literal'), 'Test object type';
+  is $lit.get-value(),
+     qq@"""abcdef\n  lkjfgdlkjd lkjdflkj"""^^<http://www.w3.org/2001/XMLSchema#string>@,
+     "Lit: {$lit.get-value()}";
+
+  is $lit.get-short-value(),
+     qq@"""abcdef\n  lkjfgdlkjd lkjdflkj"""@,
+     "Lit: {$lit.get-short-value()}";
+
+  $lit .= new(:literal('"""abcdef
+  lkjfgdlkjd lkjdflkj"""@nl'));
+  is $lit.get-value(),
+     qq@"""abcdef\n  lkjfgdlkjd lkjdflkj"""\@nl^^<http://www.w3.org/1999/02/22-rdf-syntax-ns#langString>@,
+     "Lit: {$lit.get-value()}";
+  is $lit.get-short-value(),
+     qq@"""abcdef\n  lkjfgdlkjd lkjdflkj"""\@nl@,
+     "Lit short: {$lit.get-short-value()}";
+
+}, 'literal long string';
+
+#-------------------------------------------------------------------------------
 # Cleanup
 #
-done();
+done-testing();
 exit(0);

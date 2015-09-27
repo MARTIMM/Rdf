@@ -9,9 +9,9 @@ package Rdf {
   #
   class Literal is Rdf::Node {
 
-    has Str $.lexical-form;             # Value without quotes
+    has Str $.lexical-form;             # Value with quotes if string
     has Str $.datatype;                 # Short iri format
-    has Str $.language;                     # Language without '@'
+    has Str $.language;                 # Language without '@'
 
     #---------------------------------------------------------------------------
     # Explicit datatype
@@ -25,12 +25,13 @@ package Rdf {
       #
       $!language = '';
 
-#say "Lit Q: ", $literal;
+#say "Lit Q: '$literal'";
       # Test literal with parts from the turtle grammar
       #
-      if $literal ~~ m/ ^ <Rdf::Turtle::Grammar::literal-text> $ / {
+      if $literal ~~ m:s/^ <Rdf::Turtle::Grammar::literal-text> $/ {
         my $l = $/<Rdf::Turtle::Grammar::literal-text>;
-#say "\nMatch: ", $l.perl;
+#        my $l = $literal;
+#say "Lit L: ", $l.perl;
 
         # Check for integers
         #
@@ -40,6 +41,7 @@ package Rdf {
 
           self!set-lv(:quotes('"'));
           self!set-sv(:quotes(''));
+#say "Lit double: ", self.get-value;
         }
 
 
@@ -49,6 +51,7 @@ package Rdf {
 
           self!set-lv(:quotes('"'));
           self!set-sv(:quotes(''));
+#say "Lit decimal: ", self.get-value;
         }
 
 
@@ -58,6 +61,7 @@ package Rdf {
 
           self!set-lv(:quotes('"'));
           self!set-sv(:quotes(''));
+#say "Lit integer: ", self.get-value;
         }
 
 
@@ -67,6 +71,7 @@ package Rdf {
 
           self!set-lv(:quotes('"'));
           self!set-sv(:quotes(''));
+#say "Lit boolean: ", self.get-value;
         }
 
 
@@ -83,10 +88,11 @@ package Rdf {
           $!lexical-form = $!datatype ~~ m/ 'double' /
                            ?? cleanup-double($lt)
                            !! $lt;
-#say "DTS: ~$l<datatype-string>, $!lexical-form, $!datatype";
 
           self!set-lv(:quotes('"'));
+#          self!set-lv(:quotes(''));
           self!set-sv(:quotes(''));
+#say "Lit datatype string: ", self.get-value;
         }
 
 
@@ -94,8 +100,8 @@ package Rdf {
         #
         elsif $l<quoted-string>:exists {
           $!lexical-form = ~$l<quoted-string>;
-          $!lexical-form ~~ s/^ '"' //;
-          $!lexical-form ~~ s/ '"' $//;
+#          $!lexical-form ~~ s/^ '"' //;
+#          $!lexical-form ~~ s/ '"' $//;
 
           # When language is defined, it will be in a list. This because
           # of the ()* in the regex
@@ -109,9 +115,12 @@ package Rdf {
             $!datatype = 'xsd:string';
           }
 
-          my $quotes = $!lexical-form ~~ m/ \n / ?? '"""' !! '"';
-          self!set-lv(:$quotes);
-          self!set-sv(:$quotes);
+#          my $quotes = $!lexical-form ~~ m/ \n / ?? '"""' !! '"';
+#          self!set-lv(:$quotes);
+#          self!set-sv(:$quotes);
+          self!set-lv(:quotes(''));
+          self!set-sv(:quotes(''));
+#say "Lit quoted string: ", self.get-value;
         }
       }
 
