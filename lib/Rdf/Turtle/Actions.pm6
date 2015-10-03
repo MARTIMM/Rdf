@@ -25,6 +25,10 @@ package Rdf {
     constant $PROC-COLLECTION           = 7;
     my Int $triple-parse-phase          = $START-TRIPLE;
 
+    my $subject;
+    my $predicate;
+    my $object;
+
 #    #---------------------------------------------------------------------------
 #    #
 #    method statement ( $match ) {
@@ -85,50 +89,90 @@ say "Seen-subject, phase: $triple-parse-phase";
     #---------------------------------------------------------------------------
     #
     method subject-item ( $match ) {
+say '=' x 80;
+#say "SI: '{$match.made()}', '$match'";
+#say "SI: {$match.perl()}";
+      $subject = $match<blank-node>:exists
+         ?? ~$match<blank-node>.made() // ~$match
+         !! ~$match;
+
+say "Subject: $subject";
+#`{{
       if $triple-parse-phase !~~ $SEEN-BLANKNODE {
         my $s = ~$match;
-        $s ~~ s/\s* $//;
+#        $s ~~ s/\s* $//;
         $trs[$bn-level]<subject> = $s;
       }
 say "\nSubject:     $trs[$bn-level]<subject>, phase: $triple-parse-phase, level: $bn-level";
+}}
+    }
+
+    #---------------------------------------------------------------------------
+    #
+    method predicate-object-list ( $match ) {
+#say "POI: {$match.perl()}";
+say "POI: {$match<po-list><predicate-item>.perl}";
+say "POI: {$match<po-list><object-list><object-item>.perl}";
+      
     }
 
     #---------------------------------------------------------------------------
     #
     method predicate-item ( $match ) {
-      my $p = $match;
-      $p ~~ s/\s* $//;
-      $trs[$bn-level]<predicate> = $p;
+#say "PI: {$match.perl()}";
+#say "PI: {$match.made() // '-'}";
+      my $p = ~$match;
+#      $p ~~ s/\s* $//;
+#      $trs[$bn-level]<predicate> = $p;
 
-say "Predicate:   $trs[$bn-level]<predicate>, phase: $triple-parse-phase, level: $bn-level";
+#say "Predicate:   $trs[$bn-level]<predicate>, phase: $triple-parse-phase, level: $bn-level";
+
+      $predicate = $p;
+say "Predicate: $predicate";
     }
 
     #---------------------------------------------------------------------------
     #
     method object-item ( $match ) {
+#say "OI: {$match.perl()}";
+#say "OI: {$match.made() // '-'}";
 
+      $object = $match<blank-node>:exists
+         ?? ~$match<blank-node>.made() // ~$match
+         !! ~$match;
+
+say "Object: $object";
+
+#`{{
       if $triple-parse-phase !~~ $SEEN-BLANKNODE {
         my $o = ~$match;
         $o ~~ s/\s* $//;
         $trs[$bn-level]<object> = $o;
       }
 say "Object:      $trs[$bn-level]<object>, phase: $triple-parse-phase, level: $bn-level";
+}}
 
-say "Add tuple\{PSB]\[$bn-level]: $trs[$bn-level]<subject>, $trs[$bn-level]<predicate> $trs[$bn-level]<object>";
-      my Rdf::Triple $t .= new;
-      $t .= new(
-        :subject($trs[$bn-level]<subject>),
-        :predicate($trs[$bn-level]<predicate>),
-        :object($trs[$bn-level]<object>)
-      );
+      if ?$subject and ?$predicate and ?$object {
+say "Add tuple: $subject, $predicate, $object";
+        my Rdf::Triple $t .= new(
+          :subject($subject),
+          :predicate($predicate),
+          :object($object)
+        );
 say "Triple count: {$t.get-triple-count()}";
+      }
+
+      else {
+        note "One of the tuple arguments are not defined";
+      }
     }
 
-#    #---------------------------------------------------------------------------
-#    #
-#    method blank-node ( $match ) {
-#say "Blank node:   $match, phase: $triple-parse-phase, level: $bn-level";
-#    }
+    #---------------------------------------------------------------------------
+    #
+    method blank-node ( $match ) {
+      my $bn = ~$match.made() // ~$match;
+say "Blank node:  $bn, $match, phase: $triple-parse-phase, level: $bn-level";
+    }
 
     #---------------------------------------------------------------------------
     #
@@ -182,15 +226,15 @@ say "Seen blank node:   $match, phase: $triple-parse-phase, level: $bn-level";
     #---------------------------------------------------------------------------
     #
     method collection ( $match ) {
-say "Seen collection:   $match, phase: $triple-parse-phase, level: $bn-level";
+#say "Seen collection:   $match, phase: $triple-parse-phase, level: $bn-level";
       
     }
 
     #---------------------------------------------------------------------------
     #
     method proc-collection ( $match ) {
-say "Seen collection:   $match, phase: $triple-parse-phase, level: $bn-level";
-      $triple-parse-phase = $PROC-COLLECTION;
+#say "Seen collection:   $match, phase: $triple-parse-phase, level: $bn-level";
+#      $triple-parse-phase = $PROC-COLLECTION;
     }
   }
 }

@@ -1,6 +1,8 @@
 use v6;
-use Rdf;
 #use Grammar::Tracer;
+use Rdf;
+#use Rdf::Triple;
+use Rdf::Blank;
 
 package Rdf {
 
@@ -11,9 +13,9 @@ package Rdf {
 
     #---------------------------------------------------------------------------
     #
-    rule RDF_1_0 { <statement>* }
+    rule RDF_1_0 { <.ws> <statement>* <.ws> }
     rule statement {
-      <directive> '.' | <triples> '.' | <.white-space>
+      <directive> '.' | <triples> '.' | <.comment>
     }
 
     rule directive { <prefix-id> | <base-id> }
@@ -21,24 +23,26 @@ package Rdf {
     # '@prefix' prefix-name ':' url .
     # '@prefix' ':' url .
     #
-    rule prefix-id { '@prefix' <.white-space>* <prefix-name>? ':' <uri-ref> }
+    rule prefix-id { '@prefix' <.comment>* <prefix-name>? ':' <uri-ref> }
 
     # '@base' url .
     #
-    rule base-id { '@base' <.white-space>* <uri-ref> }
+    rule base-id { '@base' <.comment>* <uri-ref> }
 
     # subject-item predicate object .
     #
+    rule triples { <subject-item> <predicate-object-list> }
+#`{{
     rule triples {
       <.start-triple> <subject-item> <.seen-subject> <predicate-object-list>
     }
-    
     token start-triple { <?> }
     token seen-subject { <?> }
+}}
 
     rule predicate-object-list {
-      <predicate-item> <object-list>
-      ( ';' <predicate-item> <object-list> )* ';'?
+      $<po-list>=(<predicate-item> <object-list>)
+      ( ';' $<po-list>=(<predicate-item> <object-list>) )* ';'?
     }
 
     rule object-list { <object-item> ( ',' <object-item> )* }
@@ -48,21 +52,27 @@ package Rdf {
     # newline characters depending on operating system.
     # (token ws is already declared by perl!!)
     #
-    rule white-space { <.comment> }
-    token comment { '#' <-[\n]>* }
+    rule comment { <.ws> '#' <-[\n]>* }
+#    token comment { '#' <-[\n]>* }
 
-    token subject-item { ( <.resource> | <.blank-node> ) }
+    # Keep blank-node data in match object because its AST might be set
+    # with a generated blank node object.
+    #
+    token subject-item { <.resource> | <blank-node> }
 
     # Turtle predicate 'a' is same as rdf:type. This also means that predicate
     # rdf must be declared as http://www.w3.org/1999/02/22-rdf-syntax-ns#
     # in Rdf.pm6.
     #
     token predicate-item {
-      [ <.resource> <?before \s> ] |
-      [ 'a' <?before \s> ]
+      <.resource> |
+      'a' <?before \s>  # 'before' needed to separate 'a' from e.g. 'a:b'
     }
 
-    token object-item { ( <.resource> | <.blank-node> | <.literal-text> ) }
+    # Keep blank-node data in match object because its AST might be set
+    # with a generated blank node object.
+    #
+    token object-item { [ <.resource> | <blank-node> | <.literal-text> ] }
 
     # '"' text '"'
     # '"""' long piece of text '"""'
@@ -101,21 +111,39 @@ package Rdf {
     token exponent { <[eE]> <[+-]>? \d+ }
     token boolean { 'true' | 'false' }
 
-    # '_:' local-name
+    # '_:' blank node
     #
     rule blank-node {
-      <node-id> |
-      '[]'      |
-      [ '[' <.proc-blank-node> <predicate-object-list> ']' <.seen-blank-node> ] |
+      # When a specification of a blank node is found then generate a
+      # blank node object with this name
+      #
+      <node-id> { say "SET BN"; make Rdf::Blank.new(blank => ~$/<node-id>); } |
+      
+      # An anonymous blank node is generated on seeing []
+      #
+      '[]' { say "GENERATE ABN 1"; make Rdf::Blank.new(blank => '[]'); } |
+
+      '[' { say "GENERATE ABN 2"; make Rdf::Blank.new(blank => '[]'); }
+          <predicate-object-list> ']' |
       <collection>
     }
-    
+#`{{
+    rule blank-node {
+      <node-id> |
+      '[]' { make Rdf::Blank.new(blank => '[]'); } |
+      [ '[' <.proc-blank-node> <predicate-object-list> ']' <.seen-blank-node> ] { make Rdf::Blank.new(blank => '[]'); } |
+      <collection>
+    }
     token proc-blank-node { <?> }
     token seen-blank-node { <?> }
+}}
+
     token node-id { '_:' <name> }
 
-    rule collection { '(' <.proc-collection> <object-item>* ')' }
+    rule collection { '(' <object-item>* ')' }
+#`{{    rule collection { '(' <.proc-collection> <object-item>* ')' }
     token proc-collection { <?> }
+}}
 #    rule collection { '(' <item-list>? ')' }
 #    rule item-list { <object-item>+ }
 
@@ -150,9 +178,10 @@ package Rdf {
     token name { <.name_start_char> <.name-char>* }
     token prefix-name { <+ name_start_char - [_]> <.name-char>* }
     token relative-uri { <.u_character>* }
+
     token quoted-string { <.string> | <.long-string> }
-    token string { '"' ~ '"' <.s_character>* }
-    token long-string { '"""' ~ '"""' <.l_character>* }
+    token string { '"' <.s_character>* '"' }
+    token long-string { '"""' <.l_character>* '"""' }
 
     token character {
         '\u' <hex>**4
@@ -165,7 +194,10 @@ package Rdf {
     token e_character { <.character> | <[\t\n\r]> }
     token u_character { <+ character - [\x3e]> | '\>' }
     token s_character { <+ e_character - [\x22]> | '\"' }
-    token l_character { <.e_character> | '\"' | \x9 | \xa | \xd }
+    
+    # Rdf 1.0 bugfix, character 0x22 must be removed because of long-string end
+    #
+    token l_character { <+ e_character - [\x22]> | '\"' | \x9 | \xa | \xd }
 
     token hex { <[0..9 a..f A..F]> }
   }

@@ -8,7 +8,8 @@ use Rdf::Triple;
 my Rdf::Turtle $turtle .= new;
 my Rdf::Triple $t .= new;
 
-#`{{
+#`{{}}
+
 #-------------------------------------------------------------------------------
 subtest {
   my Str $content = qq:to/EOTURTLE/;
@@ -56,6 +57,7 @@ subtest {
 
 }, 'default relative triple';
 
+#`{{}}
 #-------------------------------------------------------------------------------
 subtest {
   my Str $content = qq:to/EOTURTLE/;
@@ -93,7 +95,6 @@ subtest {
      "Subject: {~$t.subject}";
 
 }, 'prefix handling';
-}}
 
 #-------------------------------------------------------------------------------
 subtest {

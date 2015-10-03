@@ -12,7 +12,7 @@ package Rdf {
   #-----------------------------------------------------------------------------
   # Triples or 3-tuples of Rdf::Triple
   #
-  my Array $triples;
+  my Array $triples = [];
 
   #-----------------------------------------------------------------------------
   #
@@ -29,37 +29,52 @@ package Rdf {
     # the subject from the tuple and use it as a string for the subject,
     # predicate or object.
     #---------------------------------------------------------------------------
-    # Empty triple to get to the methods.
-    #
-    multi submethod BUILD ( ) { }
-
-    #---------------------------------------------------------------------------
     # Make triples based on strings. Arguments can be absent to return an
     # empty object.
     #
-    multi submethod BUILD (
-      Str :$subject = '', Str :$predicate = '', Str :$object = ''
-    ) {
+    multi submethod BUILD ( :$subject, :$predicate, :$object ) {
 
-say '=' x 80;
-say "TT: $subject $predicate $object";
       if ?$subject and ?$predicate and ?$object {
+
+        my Rdf::Node $s;
+        my Rdf::Node $p;
+        my Rdf::Node $o;
 
         # Get subject
         #
-        my Rdf::Node $s = self.create-node($subject);
-        die "Node for $subject is not created" unless $s.defined;
+        if $subject ~~ Rdf::Node {
+          $s = $subject;
+        }
+
+        elsif $subject ~~  Str {
+          $s = self.create-node($subject);
+          die "Subject node $subject not created" unless $s.defined;
+        }
 
         # Get predicate
         #
-        my Rdf::Node $p = self.create-node($predicate);
-        die "Node for $predicate is not created" unless $p.defined;
+        if $predicate ~~ Rdf::Node {
+          $p = $predicate;
+        }
+
+        elsif $predicate ~~ Str {
+          $p = self.create-node($predicate);
+          die "Predicate node $predicate not created" unless $p.defined;
+        }
 
         # Get object
         #
-        my Rdf::Node $o = self.create-node($object);
-        die "Node for $object is not created" unless $o.defined;
+        if $object ~~ Rdf::Node {
+          $o = $object;
+        }
 
+        elsif $object ~~ Str {
+          $o = self.create-node($object);
+          die "Object node $object not created" unless $o.defined;
+        }
+
+#say "Triple: $subject $predicate $object";
+#say "TT: ", $s.get-value, ', ', $p.get-value, ', ', $o.get-value;
         # Test for proper classes for the 3 items.
         #
         unless $s ~~ any(Rdf::IRI|Rdf::Blank)
@@ -69,39 +84,35 @@ say "TT: $subject $predicate $object";
           note "Tuple not filled according to rdf rules";
         }
 
-say "TT: ", $s.get-value, ', ', $p.get-value, ', ', $o.get-value;
         $!subject = $s;
         $!predicate = $p;
         $!object = $o;
 
+        $triples.push: self;
         $!triples-idx = $triples.end;
-        $triples.push(self);
+      }
+
+      else {
+        # Try other BUILD() method
+        #
+        callsame;
       }
     }
 
     #---------------------------------------------------------------------------
-    # Make triples based on Rdf::Node
+    # Default init where object is initialized with an entry from the triples
+    # array if any. The default data comes from the first entry.
+    # method get-triple-from-index() is not used here because it can crash when
+    # there are no entries.
     #
-    multi submethod BUILD (
-      Rdf::Node :$subject,
-      Rdf::Node :$predicate,
-      Rdf::Node :$object
-    ) {
-      $!subject = $subject;
-      $!predicate = $predicate;
-      $!object = $object;
-
-      # Test for proper classes for the 3 items.
-      #
-      unless $subject ~~ any(Rdf::IRI|Rdf::Blank)
-         and $predicate ~~ any(Rdf::IRI)
-         and $object ~~ any(Rdf::IRI|Rdf::Blank|Rdf::Literal) {
-
-        note "Tuple not filled according to rdf rules";
+    multi submethod BUILD ( Int :$index = 0 ) {
+      if 0 <= $index < $triples.elems {
+        my $t = $triples[$index];
+        $!subject = $t.subject;
+        $!predicate = $t.predicate;
+        $!object = $t.object;
+        $!triples-idx = $index;
       }
-
-      $!triples-idx = $triples.end;
-      $triples.push(self);
     }
 
     #---------------------------------------------------------------------------
