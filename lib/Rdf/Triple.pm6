@@ -29,6 +29,21 @@ package Rdf {
     # the subject from the tuple and use it as a string for the subject,
     # predicate or object.
     #---------------------------------------------------------------------------
+    # Initialize object with an entry from the triples array if any. The
+    # default data comes from the first entry. method get-triple-from-index()
+    # is not used here because it can crash when there are no entries.
+    #
+    multi submethod BUILD ( Int :$index! ) {
+      if 0 <= $index < $triples.elems {
+        my $t = $triples[$index];
+        $!subject = $t.subject;
+        $!predicate = $t.predicate;
+        $!object = $t.object;
+        $!triples-idx = $index;
+      }
+    }
+
+    #---------------------------------------------------------------------------
     # Make triples based on strings. Arguments can be absent to return an
     # empty object.
     #
@@ -90,28 +105,6 @@ package Rdf {
 
         $triples.push: self;
         $!triples-idx = $triples.end;
-      }
-
-      else {
-        # Try other BUILD() method
-        #
-        callsame;
-      }
-    }
-
-    #---------------------------------------------------------------------------
-    # Default init where object is initialized with an entry from the triples
-    # array if any. The default data comes from the first entry.
-    # method get-triple-from-index() is not used here because it can crash when
-    # there are no entries.
-    #
-    multi submethod BUILD ( Int :$index = 0 ) {
-      if 0 <= $index < $triples.elems {
-        my $t = $triples[$index];
-        $!subject = $t.subject;
-        $!predicate = $t.predicate;
-        $!object = $t.object;
-        $!triples-idx = $index;
       }
     }
 
