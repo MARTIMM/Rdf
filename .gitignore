@@ -1,6 +1,9 @@
 .directory
-*.pdf
-*.xml
-x*.pl6
-*~
+*.html
+benchmarks/*
 Old/*
+*.mbc
+*/*.mbc
+.precomp
+*/.precomp
+*.log
