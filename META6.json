@@ -1,11 +1,15 @@
 {
-  "author": "Marcel Timmerman",
+  "authors": [
+    "Marcel Timmerman"
+  ],
   "depends": [
     "File::HomeDir",
     "HTTP::UserAgent"
   ],
   "description": "Resource description framework",
   "name": "Rdf",
+  "license": "Artistic-2.0",
+  "perl": "6",
   "provides": {
     "Rdf":                      "lib/Rdf.pm6",
 
@@ -16,10 +20,10 @@
     "Rdf::Node":                "lib/Rdf/Node.pm6",
     "Rdf::Triple":              "lib/Rdf/Triple.pm6",
 
-    "Rdf::Turtle"               "lib/Rdf/Turtle.pm6",
-    "Rdf::Turtle::Grammar"      "lib/Rdf/Turtle/Grammar.pm6",
-    "Rdf::Turtle::Actions"      "lib/Rdf/Turtle/Actions.pm6"
+    "Rdf::Turtle":              "lib/Rdf/Turtle.pm6",
+    "Rdf::Turtle::Grammar":     "lib/Rdf/Turtle/Grammar.pm6",
+    "Rdf::Turtle::Actions":     "lib/Rdf/Turtle/Actions.pm6"
   },
   "source-url": "git://github.com/MARTIMM/Rdf.git",
-  "version": "0.3.3"
+  "version": "0.3.3.1"
 }
